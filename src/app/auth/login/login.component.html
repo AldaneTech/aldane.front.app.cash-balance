@@ -1,4 +1,45 @@
 <!-- login.component.html -->
-<h2>Login</h2>
-<button (click)="login()">Login</button>
-<h1 class="text-3xl font-bold underline white">  Hello world!</h1>
+<div class="h-screen w-screen flex bg-brand-background flex items-center justify-center">
+  <div class="w-4/5 h-4/5 bg-white flex rounded-lg shadow-xl">
+    <div class="w-1/2 rounded-lg">
+      <div class="flex flex-col items-center justify-center">
+        <h1 class="mt-16">💸 CashBal</h1>
+        <h2 class="mt-32 text-4xl font-bold">Welcome Back</h2>
+        <p class="text-gray-500">Please enter your details</p>
+
+        <div class="w-64 bg-gray-200 rounded-full p-1 relative flex mt-8">
+          <div
+            class="absolute top-1 left-1 w-1/2 h-[calc(100%-0.5rem)] bg-white rounded-full shadow-md transition-all duration-300"
+            [ngClass]="selected === 'SignUp' ? 'translate-x-full' : 'translate-x-0'"
+          ></div>
+        
+          <!-- Opción A -->
+          <button
+            (click)="select('SignIn')"
+            class="w-1/2 z-10 text-center py-2 font-medium transition-colors duration-300"
+            [ngClass]="selected === 'SignIn' ? 'text-black' : 'text-gray-500'"
+          >
+            Sign In
+          </button>
+        
+          <!-- Opción B -->
+          <button
+            (click)="select('SignUp')"
+            class="w-1/2 z-10 text-center py-2 font-medium transition-colors duration-300"
+            [ngClass]="selected === 'SignUp' ? 'text-black' : 'text-gray-500'"
+          >
+          Sign Up
+          </button>
+        </div>
+        
+        <button (click)="login()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Login
+        </button>
+      </div>
+
+    </div>
+    <div class="w-1/2 flex bg-black rounded-lg">
+    </div>
+  </div>
+
+</div>
