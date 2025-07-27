@@ -1,0 +1,13 @@
+<!-- layout.component.html -->
+<header>
+    <nav>
+      <a routerLink="/dashboard">Dashboard</a>
+      <a routerLink="/expenses">Expenses</a>
+      <button (click)="logout()">Logout</button>
+    </nav>
+  </header>
+  
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+  
