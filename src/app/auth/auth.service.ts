@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
-export class AuthService {
+export class AuthFrontService {
+
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth_token');
+    return !!token && !this.isTokenExpired(token);
   }
 
   login(token: string): void {
@@ -12,6 +14,24 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('auth_token');
+  }
+
+  decodeJwt(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  isTokenExpired(token: string): boolean {
+    const decoded = this.decodeJwt(token);
+    if (!decoded || !decoded.exp) return true;
+  
+    const now = Math.floor(Date.now() / 1000); // segundos
+    return decoded.exp < now;
   }
 }
 

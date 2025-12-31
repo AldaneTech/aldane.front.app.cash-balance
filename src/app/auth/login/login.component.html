@@ -1,45 +1,243 @@
 <!-- login.component.html -->
-<div class="h-screen w-screen flex bg-brand-background flex items-center justify-center">
+<div class="h-screen w-screen flex bg-brand-background items-center justify-center">
   <div class="w-4/5 h-4/5 bg-white flex rounded-lg shadow-xl">
-    <div class="w-1/2 rounded-lg">
+    <div class="w-full lg:w-1/2 rounded-lg relative">
       <div class="flex flex-col items-center justify-center">
-        <h1 class="mt-16">💸 CashBal</h1>
-        <h2 class="mt-32 text-4xl font-bold">Welcome Back</h2>
-        <p class="text-gray-500">Please enter your details</p>
+        <img src="assets/logo.webp" class="w-36 mt-16" alt="Logo CashBal">
+        <h2 class="text-4xl font-bold" [ngClass]="selected === 'SignUp' ? 'mt-16' : 'mt-32'">Welcome Back</h2>
+        <p class="text-gray-500 mt-4">Please enter your details</p>
 
-        <div class="w-64 bg-gray-200 rounded-full p-1 relative flex mt-8">
+        <div class="w-64 bg-gray-200 rounded-full p-1 relative flex mt-4">
           <div
             class="absolute top-1 left-1 w-1/2 h-[calc(100%-0.5rem)] bg-white rounded-full shadow-md transition-all duration-300"
-            [ngClass]="selected === 'SignUp' ? 'translate-x-full' : 'translate-x-0'"
-          ></div>
+            [ngClass]="selected === 'SignUp' ? 'translate-x-[calc(100%-0.5rem)]' : 'translate-x-0'"></div>
         
-          <!-- Opción A -->
+          <!-- SignIn -->
           <button
             (click)="select('SignIn')"
             class="w-1/2 z-10 text-center py-2 font-medium transition-colors duration-300"
-            [ngClass]="selected === 'SignIn' ? 'text-black' : 'text-gray-500'"
-          >
+            [ngClass]="selected === 'SignIn' ? 'text-brand-secondary' : 'text-gray-500'">
             Sign In
           </button>
         
-          <!-- Opción B -->
+          <!-- SignUp -->
           <button
             (click)="select('SignUp')"
             class="w-1/2 z-10 text-center py-2 font-medium transition-colors duration-300"
-            [ngClass]="selected === 'SignUp' ? 'text-black' : 'text-gray-500'"
-          >
+            [ngClass]="selected === 'SignUp' ? 'text-brand-secondary' : 'text-gray-500'">
           Sign Up
           </button>
         </div>
-        
-        <button (click)="login()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Login
-        </button>
-      </div>
 
+        <div *ngIf="selected === 'SignIn'" class="m-5">
+          <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="flex flex-col gap-4">
+            <div class="relative w-full max-w-sm mt-4">
+              <!-- Input real -->
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder=" "
+                [(ngModel)]="username"
+                maxlength="20"
+                minlength="4"
+                maxlength="20"
+                #usernameModel="ngModel"
+                class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+              />
+            
+              <!-- Icono + barra -->
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
+                <!-- Icono -->
+
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="2rem"  height="2rem"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
+                <!-- Separador -->
+                <div class="w-px h-8 bg-gray-300"></div>
+              </div>
+            
+                <!-- Icono de validación ✅ -->
+              <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"/>
+                </svg>
+              </div>
+
+              <!-- Icono de validación ❌ -->
+              <div *ngIf="username.length < 4 && usernameModel.dirty || username.length < 4 && usernameModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+              </div>
+
+              
+              <!-- Etiqueta flotante -->
+              <label for="username"
+                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                            peer-placeholder-shown:text-gray-400
+                            peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
+                Username
+              </label>
+            </div>
+            
+            
+            
+            <div class="relative w-full max-w-sm mt-4">
+              <!-- Input real -->
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder=" "
+                [(ngModel)]="password"
+                #passwordModel="ngModel"
+                class="peer w-full pl-16 pr-12 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+              />
+            
+              <!-- Icono + barra -->
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
+                <!-- Icono -->
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="2rem"  height="2rem"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-key"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z" /><path d="M15 9h.01" /></svg>
+
+                <!-- Separador -->
+                <div class="w-px h-8 bg-gray-300"></div>
+              </div>
+              <!-- Icono de validación ✅ -->
+              <div *ngIf="password.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"/>
+                </svg>
+              </div>
+
+              <!-- Icono de validación ❌ -->
+              <div *ngIf="password.length < 4 && passwordModel.dirty || password.length < 4 && passwordModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+              </div>
+
+              <!-- Etiqueta flotante -->
+              <label for="password"
+                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                            peer-placeholder-shown:text-gray-400
+                            peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
+                            Password
+              </label>
+            </div>
+            <button type="submit" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition">Log In</button>
+          </form>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <div *ngIf="selected === 'SignUp'" class="mt-6">
+          <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="flex flex-col gap-4">
+            <div class="relative w-full max-w-sm mt-4">
+              <!-- Input real -->
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder=" "
+                [(ngModel)]="username"
+                maxlength="20"
+                minlength="4"
+                maxlength="20"
+                #usernameModel="ngModel"
+                class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+              />
+            
+              <!-- Icono + barra -->
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
+                <!-- Icono -->
+
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="2rem"  height="2rem"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
+                <!-- Separador -->
+                <div class="w-px h-8 bg-gray-300"></div>
+              </div>
+            
+                <!-- Icono de validación ✅ -->
+              <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"/>
+                </svg>
+              </div>
+
+              <!-- Icono de validación ❌ -->
+              <div *ngIf="username.length < 4 && usernameModel.dirty || username.length < 4 && usernameModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+              </div>
+
+              
+              <!-- Etiqueta flotante -->
+              <label for="username"
+                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                            peer-placeholder-shown:text-gray-400
+                            peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
+                Username
+              </label>
+            </div>
+
+            <div class="relative w-full max-w-sm mt-4">
+              <!-- Input real -->
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder=""
+                [(ngModel)]="email"
+            
+                #usernameModel="ngModel"
+                class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+              />
+            
+              <!-- Icono + barra -->
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
+                <!-- Icono -->
+
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="2rem"  height="2rem"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
+                <!-- Separador -->
+                <div class="w-px h-8 bg-gray-300"></div>
+              </div>
+            
+                <!-- Icono de validación ✅ -->
+              <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"/>
+                </svg>
+              </div>
+
+              <!-- Icono de validación ❌ -->
+              <div *ngIf="username.length < 4 && usernameModel.dirty || username.length < 4 && usernameModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+              </div>
+
+              
+              <!-- Etiqueta flotante -->
+              <label for="email"
+                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                            peer-placeholder-shown:text-gray-400
+                            peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
+                Email
+              </label>
+            </div>
+            <input type="password" name="password" ngModel placeholder="Password" required class="p-2 rounded border" />
+            <input type="password" name="confirmPassword" ngModel placeholder="Confirm Password" required class="p-2 rounded border" />
+            <button type="submit" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition">Register</button>
+          </form>
+        </div>
+      </div>
+      <div *ngIf="selected === 'SignIn'" class="hidden xl:flex absolute bottom-4 justify-center items-end w-3/4 left-1/2 -translate-x-1/2">
+        <p class="text-center p-4 text-gray-400 text-sm">Join the millions of smart investors who trust us to manage their finances. Log in to access your personalized dashboard, track your portfolio performance, and make informed investment decisions.</p>
+      </div>      
     </div>
-    <div class="w-1/2 flex bg-black rounded-lg">
+    <div class="hidden lg:flex w-1/2 bg-[url('/assets/login.webp')] bg-cover bg-center rounded-lg">
     </div>
   </div>
-
 </div>
