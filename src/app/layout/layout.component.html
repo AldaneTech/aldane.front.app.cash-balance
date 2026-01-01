@@ -1,13 +1,61 @@
-<!-- layout.component.html -->
 <header>
-    <nav>
-      <a routerLink="/dashboard">Dashboard</a>
-      <a routerLink="/expenses">Expenses</a>
-      <button (click)="logout()">Logout</button>
-    </nav>
-  </header>
+  <nav class="w-full bg-brand-main">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between gap-4">
+        <!-- Left: Logo + links -->
+        <div class="flex items-center gap-8">
+          <!-- Logo -->
+          <a class="flex items-center gap-2" href="#">
+            <img src="assets/logo-menu.webp" class="w-36" alt="Logo CashBal">
+
+          </a>
   
-  <main>
-    <router-outlet></router-outlet>
-  </main>
+          <!-- Links (desktop) -->
+          <div class="hidden md:flex items-center gap-6">
+            <a class="text-white/80 hover:text-white transition" href="#">Dashboard</a>
+            <a class="text-white/80 hover:text-white transition" href="#">Analytics</a>
+            <a class="text-white/80 hover:text-white transition" href="#">Transactions</a>
+            <a class="text-white/80 hover:text-white transition" href="#">Wallets</a>
+          </div>
+        </div>
+    
+        <!-- Right: Icons + avatar -->
+        <div class="flex items-center gap-3">
+          <!-- Mail -->
+          <button class="relative grid h-9 w-9 place-items-center rounded-xl  hover:bg-white/15 transition">
+            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16v12H4z" />
+              <path d="M4 7l8 6 8-6" />
+            </svg>
+          </button>
+  
+          <!-- Bell with dot -->
+          <button class="relative grid h-9 w-9 place-items-center rounded-xl hover:bg-white/15 transition">
+            <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-400"></span>
+            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+          </button>
+  
+          <!-- Avatar + chevron -->
+          <button class="flex items-center gap-2 rounded-xl hover:bg-white/15 px-2 py-1.5 transition">
+            <img
+              class="h-8 w-8 rounded-full object-cover ring-2 ring-white/25"
+              src="https://i.pravatar.cc/80?img=12"
+              alt="avatar"
+            />
+            <svg class="h-4 w-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+          </div>
+          </div>
+    </div>
+  </nav>
+</header>
+  
+<main>
+  <router-outlet></router-outlet>
+</main>
   
