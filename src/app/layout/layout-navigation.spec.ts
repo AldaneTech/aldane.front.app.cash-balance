@@ -35,7 +35,7 @@ describe('Main menu navigation', () => {
     const logo = header.querySelector('img');
 
     for (const path of ['transactions', 'wallets', 'settings', 'dashboard']) {
-      const link = header.querySelector(`a[href="/${path}"]`) as HTMLAnchorElement;
+      const link = header.querySelector(`a[routerLinkActive][href="/${path}"]`) as HTMLAnchorElement;
       link.click();
       await fixture.whenStable();
       fixture.detectChanges();
