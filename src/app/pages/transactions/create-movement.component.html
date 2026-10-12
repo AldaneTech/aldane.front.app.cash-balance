@@ -1,0 +1,16 @@
+<dialog #dialog class="wallet-dialog" aria-labelledby="create-movement-title" [attr.aria-busy]="busy" (cancel)="cancel($event)">
+  <form #form="ngForm" (ngSubmit)="form.valid && save()">
+    <div class="dialog-heading"><div><p class="eyebrow">YOUR MONEY IN MOTION</p><h2 id="create-movement-title">Add movement</h2></div><button type="button" class="dialog-close" aria-label="Close" [disabled]="busy" (click)="close()">×</button></div>
+    <p class="dialog-description">Record an income or expense. Your wallet balance will update automatically.</p>
+    <fieldset [disabled]="busy">
+      <label for="movement-wallet">Wallet *</label><select id="movement-wallet" name="wallet" [(ngModel)]="draft.walletId" required autofocus><option *ngFor="let wallet of wallets" [ngValue]="wallet.id">{{ wallet.name }}</option></select>
+      <div class="form-row"><div><label for="movement-type">Type *</label><select id="movement-type" name="type" [(ngModel)]="draft.typeId" required><option [ngValue]="1">Income</option><option [ngValue]="2">Expense</option></select></div><div><label for="movement-amount">Amount (€) *</label><input id="movement-amount" type="number" name="amount" [(ngModel)]="draft.amount" min="0.01" step="0.01" max="999999999999.99" required placeholder="0.00" /></div></div>
+      <p class="field-hint">Enter a positive amount. Expenses are deducted from your balance.</p>
+      <div class="form-row"><div><label for="movement-date">Date *</label><input id="movement-date" type="date" name="date" [(ngModel)]="draft.date" required /></div><div><label for="movement-category">Category</label><select id="movement-category" name="category" [(ngModel)]="draft.categoryId"><option [ngValue]="undefined">Uncategorized</option><option *ngFor="let item of categories" [ngValue]="item.id">{{ item.name }}</option></select></div></div>
+      <div class="form-row"><div><label for="movement-store">Store</label><select id="movement-store" name="store" [(ngModel)]="draft.storeId"><option [ngValue]="undefined">None</option><option *ngFor="let item of stores" [ngValue]="item.id">{{ item.name }}</option></select></div><div><label for="movement-brand">Brand</label><select id="movement-brand" name="brand" [(ngModel)]="draft.brandId"><option [ngValue]="undefined">None</option><option *ngFor="let item of brands" [ngValue]="item.id">{{ item.name }}</option></select></div></div>
+      <label for="movement-comment">Description <span class="optional">(optional)</span></label><textarea id="movement-comment" name="comment" [(ngModel)]="draft.comment" maxlength="255" rows="2" placeholder="What was this movement for?"></textarea>
+    </fieldset>
+    <p *ngIf="error" class="dialog-error" role="alert">{{ error }}</p><p *ngIf="busy" class="dialog-progress" role="status">Saving your movement… Please wait.</p>
+    <div class="dialog-actions"><button type="button" class="secondary-button" [disabled]="busy" (click)="close()">Cancel</button><button type="submit" class="primary-button" [disabled]="busy || form.invalid">{{ busy ? 'Saving…' : 'Add movement' }}</button></div>
+  </form>
+</dialog>

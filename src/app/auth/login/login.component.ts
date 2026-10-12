@@ -15,6 +15,8 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   email: string = '';
+  registerPassword: string = '';
+  confirmPassword: string = '';
   select(option: 'SignIn' | 'SignUp') {
     this.selected = option;
   }
@@ -40,10 +42,7 @@ export class LoginComponent {
       }
     });
 
-    console.log('Logging in...');
-    const fakeToken = '1234';
-    //this.auth.login(fakeToken);
-    this.router.navigate(['/']);
+
   }
   
   onRegister() {

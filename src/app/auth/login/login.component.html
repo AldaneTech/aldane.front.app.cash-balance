@@ -1,17 +1,17 @@
 <!-- login.component.html -->
 <div class="h-screen w-screen flex bg-brand-background items-center justify-center">
   <div class="w-4/5 h-4/5 bg-white flex rounded-lg shadow-xl">
-    <div class="w-full lg:w-1/2 rounded-lg relative">
+    <div class="w-full lg:w-1/2 rounded-lg relative" [class.overflow-y-auto]="selected === 'SignUp'">
       <div class="flex flex-col items-center justify-center">
-        <img src="assets/logo.webp" class="w-36 mt-16" alt="Logo CashBal">
-        <h2 class="text-4xl font-bold" [ngClass]="selected === 'SignUp' ? 'mt-16' : 'mt-32'">Welcome Back</h2>
+        <img src="assets/logo.webp" class="w-36" [ngClass]="selected === 'SignUp' ? 'mt-10' : 'mt-16'" alt="Logo CashBal">
+        <h2 class="text-4xl font-bold" [ngClass]="selected === 'SignUp' ? 'mt-10' : 'mt-32'">Welcome Back</h2>
         <p class="text-gray-500 mt-4">Please enter your details</p>
 
         <div class="w-64 bg-gray-200 rounded-full p-1 relative flex mt-4">
           <div
             class="absolute top-1 left-1 w-1/2 h-[calc(100%-0.5rem)] bg-white rounded-full shadow-md transition-all duration-300"
             [ngClass]="selected === 'SignUp' ? 'translate-x-[calc(100%-0.5rem)]' : 'translate-x-0'"></div>
-        
+
           <!-- SignIn -->
           <button
             (click)="select('SignIn')"
@@ -19,7 +19,7 @@
             [ngClass]="selected === 'SignIn' ? 'text-brand-secondary' : 'text-gray-500'">
             Sign In
           </button>
-        
+
           <!-- SignUp -->
           <button
             (click)="select('SignUp')"
@@ -45,7 +45,7 @@
                 #usernameModel="ngModel"
                 class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
-            
+
               <!-- Icono + barra -->
               <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
                 <!-- Icono -->
@@ -54,7 +54,7 @@
                 <!-- Separador -->
                 <div class="w-px h-8 bg-gray-300"></div>
               </div>
-            
+
                 <!-- Icono de validación ✅ -->
               <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -69,19 +69,19 @@
                 <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
               </div>
 
-              
+
               <!-- Etiqueta flotante -->
               <label for="username"
-                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
-                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
                             peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
                 Username
               </label>
             </div>
-            
-            
-            
+
+
+
             <div class="relative w-full max-w-sm mt-4">
               <!-- Input real -->
               <input
@@ -93,7 +93,7 @@
                 #passwordModel="ngModel"
                 class="peer w-full pl-16 pr-12 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
-            
+
               <!-- Icono + barra -->
               <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
                 <!-- Icono -->
@@ -118,8 +118,8 @@
 
               <!-- Etiqueta flotante -->
               <label for="password"
-                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
-                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
                             peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
                             Password
@@ -130,9 +130,9 @@
         </div>
 
         <!-- Formulario de Registro -->
-        <div *ngIf="selected === 'SignUp'" class="mt-6">
+        <div *ngIf="selected === 'SignUp'" class="mt-6 mb-8 px-4 w-full max-w-sm">
           <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="flex flex-col gap-4">
-            <div class="relative w-full max-w-sm mt-4">
+            <div class="relative w-full max-w-sm">
               <!-- Input real -->
               <input
                 type="text"
@@ -144,9 +144,9 @@
                 minlength="4"
                 maxlength="20"
                 #usernameModel="ngModel"
-                class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+                class="peer w-full pl-16 pr-12 pt-5 pb-2 text-base h-14 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
-            
+
               <!-- Icono + barra -->
               <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
                 <!-- Icono -->
@@ -155,7 +155,7 @@
                 <!-- Separador -->
                 <div class="w-px h-8 bg-gray-300"></div>
               </div>
-            
+
                 <!-- Icono de validación ✅ -->
               <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -170,30 +170,32 @@
                 <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
               </div>
 
-              
+
               <!-- Etiqueta flotante -->
               <label for="username"
-                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
-                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                     class="absolute left-16 top-2 text-gray-400 text-xs transition-all
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
-                            peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
+                            peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
                 Username
               </label>
             </div>
 
-            <div class="relative w-full max-w-sm mt-4">
+            <div class="relative w-full max-w-sm">
               <!-- Input real -->
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder=""
+                placeholder=" "
                 [(ngModel)]="email"
-            
-                #usernameModel="ngModel"
-                class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+
+                #emailModel="ngModel"
+                email
+                required
+                class="peer w-full pl-16 pr-12 pt-5 pb-2 text-base h-14 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
-            
+
               <!-- Icono + barra -->
               <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
                 <!-- Icono -->
@@ -202,9 +204,9 @@
                 <!-- Separador -->
                 <div class="w-px h-8 bg-gray-300"></div>
               </div>
-            
+
                 <!-- Icono de validación ✅ -->
-              <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+              <div *ngIf="emailModel.valid" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -213,29 +215,105 @@
               </div>
 
               <!-- Icono de validación ❌ -->
-              <div *ngIf="username.length < 4 && usernameModel.dirty || username.length < 4 && usernameModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+              <div *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
                 <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
               </div>
 
-              
+
               <!-- Etiqueta flotante -->
               <label for="email"
-                     class="absolute left-16 top-2 text-gray-400 text-sm transition-all 
-                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                     class="absolute left-16 top-2 text-gray-400 text-xs transition-all
+                            peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
-                            peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
+                            peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
                 Email
               </label>
             </div>
-            <input type="password" name="password" ngModel placeholder="Password" required class="p-2 rounded border" />
-            <input type="password" name="confirmPassword" ngModel placeholder="Confirm Password" required class="p-2 rounded border" />
+            <div class="relative w-full max-w-sm">
+              <input
+                type="password"
+                id="register-password"
+                name="registerPassword"
+                placeholder=" "
+                [(ngModel)]="registerPassword"
+                #registerPasswordModel="ngModel"
+                autocomplete="new-password"
+                required
+                minlength="8"
+                maxlength="72"
+                [attr.aria-invalid]="(registerPasswordModel.dirty || registerPasswordModel.touched) && !(registerPasswordModel.valid)"
+                aria-describedby="register-password-hint"
+                class="peer w-full pl-16 pr-12 pt-5 pb-2 text-base h-14 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+              />
+              <div aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
+                <svg aria-hidden="true"  xmlns="http://www.w3.org/2000/svg"  width="2rem"  height="2rem"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-key"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z" /><path d="M15 9h.01" /></svg>
+                <div class="w-px h-8 bg-gray-300"></div>
+              </div>
+              <div *ngIf="registerPasswordModel.valid" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="(registerPasswordModel.dirty || registerPasswordModel.touched) && !(registerPasswordModel.valid)" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6l-12 12M6 6l12 12" />
+                </svg>
+              </div>
+              <label for="register-password" class="absolute left-16 top-2 text-gray-400 text-xs transition-all
+                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+                     peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
+                Password
+              </label>
+            </div>
+            <p id="register-password-hint" class="text-xs text-gray-500" aria-live="polite">
+              Use at least 8 characters.
+            </p>
+            <div class="relative w-full max-w-sm">
+              <input
+                type="password"
+                id="confirm-password"
+                name="confirmPassword"
+                placeholder=" "
+                [(ngModel)]="confirmPassword"
+                #confirmPasswordModel="ngModel"
+                autocomplete="new-password"
+                required
+                minlength="8"
+                maxlength="72"
+                [attr.aria-invalid]="(confirmPasswordModel.dirty || confirmPasswordModel.touched) && !(confirmPasswordModel.valid && confirmPassword === registerPassword)"
+                aria-describedby="confirm-password-hint"
+                class="peer w-full pl-16 pr-12 pt-5 pb-2 text-base h-14 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
+              />
+              <div aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500">
+                <svg aria-hidden="true"  xmlns="http://www.w3.org/2000/svg"  width="2rem"  height="2rem"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-key"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z" /><path d="M15 9h.01" /></svg>
+                <div class="w-px h-8 bg-gray-300"></div>
+              </div>
+              <div *ngIf="confirmPasswordModel.valid && confirmPassword === registerPassword" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="(confirmPasswordModel.dirty || confirmPasswordModel.touched) && !(confirmPasswordModel.valid && confirmPassword === registerPassword)" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6l-12 12M6 6l12 12" />
+                </svg>
+              </div>
+              <label for="confirm-password" class="absolute left-16 top-2 text-gray-400 text-xs transition-all
+                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+                     peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
+                Confirm Password
+              </label>
+            </div>
+            <p id="confirm-password-hint" class="text-xs text-gray-500" aria-live="polite">
+              {{ (confirmPasswordModel.dirty || confirmPasswordModel.touched) && !(confirmPasswordModel.valid && confirmPassword === registerPassword) ? 'Passwords must match.' : 'Repeat your password.' }}
+            </p>
             <button type="submit" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition">Register</button>
           </form>
         </div>
       </div>
       <div *ngIf="selected === 'SignIn'" class="hidden xl:flex absolute bottom-4 justify-center items-end w-3/4 left-1/2 -translate-x-1/2">
         <p class="text-center p-4 text-gray-400 text-sm">Join the millions of smart investors who trust us to manage their finances. Log in to access your personalized dashboard, track your portfolio performance, and make informed investment decisions.</p>
-      </div>      
+      </div>
     </div>
     <div class="hidden lg:flex w-1/2 bg-[url('/assets/login.webp')] bg-cover bg-center rounded-lg">
     </div>

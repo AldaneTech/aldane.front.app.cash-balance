@@ -1,0 +1,34 @@
+<div class="finance-page wallets-page" *ngIf="view$ | async as vm" [attr.aria-busy]="vm.loading">
+  <header class="page-heading"><div><p class="eyebrow">A PLACE FOR EVERY MOVEMENT</p><h1>Your wallets</h1><p>Organize your finances. Understand every balance.</p></div><div class="wallet-heading-actions"><span class="period-pill">{{ period.year }} · Year to date</span><button type="button" class="primary-button" (click)="openCreate()">+ Create wallet</button></div></header>
+  <div *ngIf="successMessage" class="success-notice" role="status">{{ successMessage }}</div>
+  <div class="wallet-loading" role="status"><span [style.visibility]="vm.loading ? 'visible' : 'hidden'">Updating wallet details…</span></div>
+  <div *ngIf="vm.error" class="error-notice" role="alert">{{ vm.error }} <button (click)="reload()">Try again</button></div>
+  <ng-container *ngIf="vm.data as data">
+    <section class="wallet-selector" aria-label="Select a wallet"><a class="wallet-card all-wallets" routerLink="/wallets" [class.selected-wallet]="!data.walletId"><span class="wallet-symbol">▣</span><h3>All wallets</h3><small>{{ data.wallets.length }} wallets</small></a><a class="wallet-card" *ngFor="let wallet of data.wallets; trackBy: trackWallet" [routerLink]="['/wallets', wallet.id]" [class.selected-wallet]="data.walletId === wallet.id"><div class="wallet-card-top"><span class="wallet-symbol">▣</span><span class="subtle-pill">{{ wallet.status?.id === 1 ? 'Active' : 'Archived' }}</span></div><h3>{{ wallet.name }}</h3><small>Current balance</small><strong>{{ wallet.budget | currency:'EUR' }}</strong></a></section>
+    <div class="section-heading"><div><h2>{{ data.selected?.name || 'All wallets' }}</h2><p>{{ data.selected?.comment || 'Balance and activity across your selected movements.' }}</p></div><a routerLink="/transactions" [queryParams]="data.walletId ? {walletId: data.walletId} : {}" class="text-link">View movements →</a></div>
+    <section class="stat-grid">
+      <article class="stat-card"><div class="stat-top"><span>Current balance</span><span class="stat-icon">▣</span></div><strong>{{ data.summary.balance | currency:'EUR' }}</strong><small>{{ data.selected?.creation_date ? 'Created ' + (data.selected?.creation_date | date:'dd MMM yyyy':'UTC') : 'Across your active wallets' }}</small></article>
+      <article class="stat-card"><div class="stat-top"><span>Income this year</span><span class="stat-icon">↙</span></div><strong>{{ data.summary.income | currency:'EUR' }}</strong><small class="income-text">From 1 January {{ period.year }}</small></article>
+      <article class="stat-card"><div class="stat-top"><span>Expenses this year</span><span class="stat-icon warm">↗</span></div><strong>{{ data.summary.expenses | currency:'EUR' }}</strong><small class="expense-text">{{ data.summary.entryCount }} movements this year</small></article>
+    </section>
+    <section class="panel"><div class="panel-heading"><div><h2>Monthly expenses</h2><p>Spending from January to the current month</p></div><span class="subtle-pill">{{ period.year }}</span></div><app-monthly-chart mode="bar" [data]="data.monthly" [year]="period.year" [monthCount]="period.monthCount" /></section>
+    <section class="panel"><div class="panel-heading"><div><h2>Latest movements</h2><p>Your five most recent movements · all dates</p></div></div><app-movement-table [entries]="data.latest.items" [compact]="true" /></section>
+    <p *ngIf="!data.wallets.length" class="empty-copy">No active wallets yet. Your balances and activity will appear here.</p>
+  </ng-container>
+</div>
+
+<dialog #createDialog class="wallet-dialog" aria-labelledby="create-wallet-title" (cancel)="cancelCreate($event)" [attr.aria-busy]="creating">
+  <form #walletForm="ngForm" (ngSubmit)="walletForm.valid && createWallet()">
+    <div class="dialog-heading"><div><p class="eyebrow">ORGANIZE YOUR MONEY</p><h2 id="create-wallet-title">Create wallet</h2></div><button type="button" class="dialog-close" aria-label="Close" [disabled]="creating" (click)="closeCreate()">×</button></div>
+    <p class="dialog-description">Give your movements a place of their own. Your new wallet starts with a zero balance.</p>
+    <fieldset [disabled]="creating">
+      <label for="wallet-name">Name <span aria-hidden="true">*</span></label>
+      <input id="wallet-name" name="name" [(ngModel)]="draft.name" required maxlength="255" pattern=".*\S.*" placeholder="e.g. Everyday expenses" autofocus />
+      <label for="wallet-comment">Description <span class="optional">(optional)</span></label>
+      <textarea id="wallet-comment" name="comment" [(ngModel)]="draft.comment" maxlength="255" rows="3" placeholder="What will you use this wallet for?"></textarea>
+    </fieldset>
+    <p *ngIf="createError" class="dialog-error" role="alert">{{ createError }}</p>
+    <p *ngIf="creating" class="dialog-progress" role="status">Creating your wallet… Please wait.</p>
+    <div class="dialog-actions"><button type="button" class="secondary-button" [disabled]="creating" (click)="closeCreate()">Cancel</button><button type="submit" class="primary-button" [disabled]="creating || walletForm.invalid || !draft.name.trim()">{{ creating ? 'Creating…' : 'Create wallet' }}</button></div>
+  </form>
+</dialog>

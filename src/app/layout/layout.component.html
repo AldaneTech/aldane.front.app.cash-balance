@@ -1,24 +1,25 @@
 <header>
-  <nav class="w-full bg-brand-main">
+  <nav class="w-full bg-brand-main" aria-label="Main navigation">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between gap-4">
         <!-- Left: Logo + links -->
         <div class="flex items-center gap-8">
           <!-- Logo -->
-          <a class="flex items-center gap-2" href="#">
-            <img src="assets/logo-menu.webp" class="w-36" alt="Logo CashBal">
+          <a class="flex items-center gap-2" routerLink="/dashboard">
+            <img src="assets/logo-menu.webp" width="144" height="40" class="w-36" alt="Logo CashBal">
 
           </a>
-  
-          <!-- Links (desktop) -->
-          <div class="hidden md:flex items-center gap-6">
-            <a class="text-white/80 hover:text-white transition" href="#">Dashboard</a>
-            <a class="text-white/80 hover:text-white transition" href="#">Analytics</a>
-            <a class="text-white/80 hover:text-white transition" href="#">Transactions</a>
-            <a class="text-white/80 hover:text-white transition" href="#">Wallets</a>
+
+          <div class="hidden md:flex items-center gap-2">
+            <a *ngFor="let item of menuItems" [routerLink]="item.path"
+               routerLinkActive="bg-white/15 text-white" [routerLinkActiveOptions]="{ exact: item.path !== '/wallets' }"
+               ariaCurrentWhenActive="page"
+               class="rounded-xl px-3 py-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
+              {{ item.label }}
+            </a>
           </div>
         </div>
-    
+
         <!-- Right: Icons + avatar -->
         <div class="flex items-center gap-3">
           <!-- Mail -->
@@ -28,7 +29,7 @@
               <path d="M4 7l8 6 8-6" />
             </svg>
           </button>
-  
+
           <!-- Bell with dot -->
           <button class="relative grid h-9 w-9 place-items-center rounded-xl hover:bg-white/15 transition">
             <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-400"></span>
@@ -37,7 +38,7 @@
               <path d="M13.73 21a2 2 0 01-3.46 0" />
             </svg>
           </button>
-  
+
           <!-- Avatar + chevron -->
           <button class="flex items-center gap-2 rounded-xl hover:bg-white/15 px-2 py-1.5 transition">
             <img
@@ -52,10 +53,18 @@
           </div>
           </div>
     </div>
+    <div class="flex gap-2 overflow-x-auto px-4 pb-3 md:hidden">
+      <a *ngFor="let item of menuItems" [routerLink]="item.path"
+         routerLinkActive="bg-white/15 text-white" [routerLinkActiveOptions]="{ exact: item.path !== '/wallets' }"
+         ariaCurrentWhenActive="page"
+         class="shrink-0 rounded-xl px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
+        {{ item.label }}
+      </a>
+    </div>
   </nav>
 </header>
-  
-<main>
+
+<main class="min-h-[calc(100dvh-4rem)] bg-brand-background px-4 py-6 sm:px-6 lg:px-8">
   <router-outlet></router-outlet>
 </main>
-  
+

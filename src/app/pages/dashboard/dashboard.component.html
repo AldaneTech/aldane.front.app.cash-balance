@@ -1,1 +1,24 @@
-<p>dashboard works!</p>
+<div class="finance-page" *ngIf="view$ | async as vm" [attr.aria-busy]="vm.loading">
+  <header class="page-heading"><div><p class="eyebrow">YOUR FINANCES, AT A GLANCE</p><h1>Overview</h1><p>Your wallets and movements, all in one place.</p></div><span class="period-pill">◷ &nbsp; {{ period.from | date:'dd MMM':'UTC' }} — {{ period.to | date:'dd MMM yyyy':'UTC' }}</span></header>
+  <div *ngIf="vm.loading" class="loading-strip" role="status">Updating your overview…</div>
+  <div *ngIf="vm.error" class="error-notice" role="alert">{{ vm.error }} <button (click)="reload()">Try again</button></div>
+  <ng-container *ngIf="vm.data as data">
+    <section class="stat-grid" aria-label="Annual financial summary">
+      <article class="stat-card"><div class="stat-top"><span>Current balance</span><span class="stat-icon">▣</span></div><strong>{{ data.summary.balance | currency:'EUR' }}</strong><small>Across your active wallets</small><span class="mini-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></article>
+      <article class="stat-card"><div class="stat-top"><span>Total income</span><span class="stat-icon">↙</span></div><strong>{{ data.summary.income | currency:'EUR' }}</strong><small class="income-text">Year to date · {{ period.year }}</small><span class="mini-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></article>
+      <article class="stat-card"><div class="stat-top"><span>Total expenses</span><span class="stat-icon warm">↗</span></div><strong>{{ data.summary.expenses | currency:'EUR' }}</strong><small class="expense-text">{{ data.summary.entryCount }} movements this year</small><span class="mini-bars warm" aria-hidden="true"><i></i><i></i><i></i><i></i></span></article>
+    </section>
+    <section class="overview-grid">
+      <article class="panel"><div class="panel-heading"><div><h2>Balance overview</h2><p>Monthly income and expenses</p></div><span class="subtle-pill">{{ period.year }}</span></div><app-monthly-chart [data]="data.monthly" [year]="period.year" [monthCount]="period.monthCount" /></article>
+      <article class="panel"><div class="panel-heading"><div><h2>Spending by category</h2><p>Where your money goes this year</p></div></div>
+        <div class="category-total"><small>Total expenses</small><strong>{{ data.summary.expenses | currency:'EUR' }}</strong></div>
+        <div class="category-list"><div *ngFor="let category of data.categories.slice(0, 6)" class="category-row"><div><span>{{ category.categoryName || 'Uncategorized' }}</span><strong>{{ category.expenses | currency:'EUR' }}</strong></div><div class="progress-track"><span [style.width.%]="categoryShare(category.expenses, data.summary.expenses)"></span></div></div></div>
+        <p *ngIf="!data.categories.length" class="empty-copy">No expenses recorded this year.</p>
+      </article>
+    </section>
+    <section><div class="section-heading"><div><h2>Your wallets</h2><p>Current balance and activity in {{ period.year }}</p></div><a routerLink="/wallets" class="text-link">View wallets →</a></div>
+      <div class="wallet-grid"><a *ngFor="let item of data.walletSummaries" class="wallet-card" [routerLink]="['/wallets', item.wallet.id]"><div class="wallet-card-top"><span class="wallet-symbol">▣</span><span class="subtle-pill">Active</span></div><h3>{{ item.wallet.name }}</h3><small>Current balance</small><strong>{{ item.wallet.budget | currency:'EUR' }}</strong><div class="wallet-card-footer"><span>↙ {{ item.summary.income | currency:'EUR' }}</span><span>↗ {{ item.summary.expenses | currency:'EUR' }}</span></div></a></div>
+      <div *ngIf="!data.walletSummaries.length" class="panel empty-copy">You do not have any active wallets yet.</div>
+    </section>
+  </ng-container>
+</div>

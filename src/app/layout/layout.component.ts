@@ -8,6 +8,12 @@ import { Router } from '@angular/router';
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
+  readonly menuItems = [
+    { path: '/dashboard', label: 'Overview' },
+    { path: '/transactions', label: 'Movements' },
+    { path: '/wallets', label: 'Wallets' },
+    { path: '/settings', label: 'Settings' }
+  ];
 
   constructor(private auth: AuthFrontService, private router: Router) {}
 

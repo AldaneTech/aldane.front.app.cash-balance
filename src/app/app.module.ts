@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { MonthlyChartComponent } from './shared/monthly-chart.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
@@ -20,6 +21,7 @@ import { apiClientConfiguration } from './api-client-config';
   ],
   imports: [
     BrowserModule,
+    MonthlyChartComponent,
     AppRoutingModule,
     FormsModule,
     HttpClientModule
