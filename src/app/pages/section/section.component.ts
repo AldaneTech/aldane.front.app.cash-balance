@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-section',
   standalone: true,
+  imports: [I18nModule],
   template: `
     <section class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-sm sm:p-8">
       <h1 class="text-2xl font-bold text-brand-secondary">{{ title | t }}</h1>
