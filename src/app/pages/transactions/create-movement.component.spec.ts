@@ -6,6 +6,10 @@ import { CashBalanceService } from '../../core/cash-balance.service';
 import { CreateMovementComponent } from './create-movement.component';
 
 describe('CreateMovementComponent', () => {
+  afterEach(() => {
+    localStorage.removeItem('cash_balance_language');
+    document.documentElement.lang = 'es';
+  });
   async function setup() {
     const response = new Subject<AccountEntry>();
     const api = { createEntry: jasmine.createSpy().and.returnValue(response), updateEntry: jasmine.createSpy().and.returnValue(response), deleteEntry: jasmine.createSpy().and.returnValue(response) };

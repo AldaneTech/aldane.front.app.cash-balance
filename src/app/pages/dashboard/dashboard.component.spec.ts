@@ -9,6 +9,10 @@ import { resource, CashBalanceService } from '../../core/cash-balance.service';
 import { MonthlyChartComponent } from '../../shared/monthly-chart.component';
 
 describe('DashboardComponent', () => {
+  afterEach(() => {
+    localStorage.removeItem('cash_balance_language');
+    document.documentElement.lang = 'es';
+  });
   it('renders an empty annual overview without requesting a nonexistent wallet', async () => {
     const api = {
       view: (_name: string, trigger: Observable<any>, fetch: (params: any) => Observable<any>) => resource(trigger, fetch),

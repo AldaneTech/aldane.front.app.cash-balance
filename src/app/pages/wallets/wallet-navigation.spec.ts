@@ -12,6 +12,10 @@ import { WalletsComponent } from './wallets.component';
 class WalletNavigationHost {}
 
 describe('Wallet navigation', () => {
+  afterEach(() => {
+    localStorage.removeItem('cash_balance_language');
+    document.documentElement.lang = 'es';
+  });
   it('keeps the cards and chart mounted while loading a different wallet and returning to all wallets', async () => {
     const totals: Summary = { balance: 100, income: 100, expenses: 0, net: 100, entryCount: 1 };
     const pending = new Subject<Summary>();

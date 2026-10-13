@@ -15,6 +15,10 @@ class NavigationHostComponent {}
 class DashboardStubComponent {}
 
 describe('Main menu navigation', () => {
+  afterEach(() => {
+    localStorage.removeItem('cash_balance_language');
+    document.documentElement.lang = 'es';
+  });
   it('keeps the same header and logo while navigating between child views', async () => {
     await TestBed.configureTestingModule({
       providers: [{ provide: CashBalanceService, useValue: { preferences: () => of({ language: 'en' }), profile: () => of({ id: 7, username: 'Alice Example', email: 'alice@example.com' }), profileUpdates$: of() } }],

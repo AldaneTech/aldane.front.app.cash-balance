@@ -1,3 +1,4 @@
+import { I18nService } from '../../i18n/i18n.service';
 import { FormUiModule } from '../../shared/forms/form-ui.module';
 import { I18nModule } from '../../i18n/i18n.module';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -9,6 +10,10 @@ import { AuthFrontService } from '../auth.service';
 import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
+  afterEach(() => {
+    localStorage.removeItem('cash_balance_language');
+    document.documentElement.lang = 'es';
+  });
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let auth: jasmine.SpyObj<AuthService>;
@@ -28,6 +33,7 @@ describe('LoginComponent', () => {
         { provide: AuthFrontService, useValue: session }, { provide: Router, useValue: router }
       ]
     }).compileComponents();
+    TestBed.inject(I18nService).setLanguage('es');
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

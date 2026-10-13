@@ -8,6 +8,10 @@ import { resource, CashBalanceService } from '../../core/cash-balance.service';
 import { WalletsComponent } from './wallets.component';
 
 describe('Wallet creation', () => {
+  afterEach(() => {
+    localStorage.removeItem('cash_balance_language');
+    document.documentElement.lang = 'es';
+  });
   async function setup() {
     const response = new Subject<Wallet>();
     const api = {
