@@ -10,14 +10,15 @@ import { AccountEntry } from '@aldanetech/cash-balance-api-client-angular';
         <thead><tr><th>Movement</th><th *ngIf="!compact">Wallet</th><th>Category</th><th>Type</th>
           <th [attr.aria-sort]="sortBy === 'date' ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" [disabled]="compact" (click)="sort.emit('date')">Date {{ sortBy === 'date' ? (direction === 'asc' ? '↑' : '↓') : '' }}</button></th>
           <th class="amount" [attr.aria-sort]="sortBy === 'amount' ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" [disabled]="compact" (click)="sort.emit('amount')">Amount {{ sortBy === 'amount' ? (direction === 'asc' ? '↑' : '↓') : '' }}</button></th>
-        </tr></thead>
+        <th *ngIf="editable">Actions</th></tr></thead>
         <tbody><tr *ngFor="let entry of entries; trackBy: trackEntry">
           <td><div class="movement-name"><span class="movement-icon" [class.expense]="amount(entry) < 0">{{ amount(entry) < 0 ? '↗' : '↙' }}</span><div><strong>{{ entry.comment || entry.store?.name || 'Movement #' + entry.id }}</strong><small>{{ subtitle(entry) }}</small></div></div></td>
           <td *ngIf="!compact">{{ entry.wallet?.name || '—' }}</td><td>{{ entry.category?.name || 'Uncategorized' }}</td>
           <td><span class="type-badge" [class.expense]="amount(entry) < 0">{{ entry.type_operation?.name || (amount(entry) < 0 ? 'Expense' : 'Income') }}</span></td>
           <td class="date">{{ entry.date ? (entry.date | date:'dd MMM yyyy':'UTC') : '—' }}</td>
           <td class="amount" [class.negative]="amount(entry) < 0" [class.positive]="amount(entry) > 0">{{ amount(entry) > 0 ? '+' : '' }}{{ amount(entry) | currency:'EUR' }}</td>
-        </tr><tr *ngIf="!entries.length"><td [attr.colspan]="compact ? 5 : 6" class="empty-table">No movements match this selection.</td></tr></tbody>
+        <td *ngIf="editable"><button type="button" (click)="edit.emit(entry)" [disabled]="busy" [attr.aria-label]="'Edit movement ' + entry.id">Edit</button> · <button type="button" (click)="remove.emit(entry)" [disabled]="busy" [attr.aria-label]="'Delete movement ' + entry.id">Delete</button></td>
+        </tr><tr *ngIf="!entries.length"><td [attr.colspan]="(compact ? 5 : 6) + (editable ? 1 : 0)" class="empty-table">No movements match this selection.</td></tr></tbody>
       </table>
     </div>
   `,
@@ -26,6 +27,10 @@ import { AccountEntry } from '@aldanetech/cash-balance-api-client-angular';
 export class MovementTableComponent {
   @Input() entries: AccountEntry[] = [];
   @Input() compact = false;
+  @Input() editable = false;
+  @Input() busy = false;
+  @Output() edit = new EventEmitter<AccountEntry>();
+  @Output() remove = new EventEmitter<AccountEntry>();
   @Input() sortBy = 'date';
   @Input() direction = 'desc';
   @Output() sort = new EventEmitter<'date' | 'amount'>();

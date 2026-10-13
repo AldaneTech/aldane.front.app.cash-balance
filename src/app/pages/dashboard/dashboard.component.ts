@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { BehaviorSubject, forkJoin, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { CashBalanceService, resource, yearToDate } from '../../core/cash-balance.service';
+import { CashBalanceService, yearToDate } from '../../core/cash-balance.service';
 
 @Component({ selector: 'app-dashboard', templateUrl: './dashboard.component.html', styleUrl: './dashboard.component.scss' })
 export class DashboardComponent {
@@ -10,7 +10,7 @@ export class DashboardComponent {
   readonly view$;
   constructor(private api: CashBalanceService) {
     const { from, to } = this.period;
-    this.view$ = resource(this.refresh, () => forkJoin({
+    this.view$ = this.api.view('overview', this.refresh, () => forkJoin({
       wallets: this.api.wallets(), summary: this.api.summary(from, to), monthly: this.api.monthly(from, to), categories: this.api.byCategory(from, to)
     }).pipe(switchMap(data => {
       const wallets = data.wallets.filter(w => w.status?.id === 1);

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { combineLatest, BehaviorSubject, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CashBalanceService, resource, yearToDate } from '../../core/cash-balance.service';
+import { CashBalanceService, yearToDate } from '../../core/cash-balance.service';
 import { MonthlyChartComponent } from '../../shared/monthly-chart.component';
 import { MovementTableComponent } from '../../shared/movement-table.component';
 
@@ -14,8 +14,8 @@ export class WalletsComponent {
   private refresh = new BehaviorSubject<void>(undefined);
   readonly view$;
   constructor(private api: CashBalanceService, route: ActivatedRoute) {
-    this.view$ = resource(combineLatest([route.paramMap, this.refresh]), ([params]) => {
-      const walletId = params.has('walletId') ? Number(params.get('walletId')) : undefined;
+    this.view$ = this.api.view('wallets', combineLatest([route.paramMap.pipe(map(params => params.get('walletId'))), this.refresh]), ([params]) => {
+      const walletId = params !== null ? Number(params) : undefined;
       const { from, to } = this.period;
       return forkJoin({ wallets: api.wallets(), summary: api.summary(from, to, walletId), monthly: api.monthly(from, to, walletId), latest: api.entries({ walletId, size: 5, sortBy: 'date', direction: 'desc' }) })
         .pipe(map(data => ({ ...data, wallets: data.wallets.filter(w => w.status?.id === 1), selected: data.wallets.find(w => w.id === walletId), walletId })));

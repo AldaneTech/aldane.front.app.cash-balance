@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Configuration, Wallet, AccountEntry, Category, Brand, Store, User } from '@aldanetech/cash-balance-api-client-angular';
-import { Observable, concat, of, forkJoin } from 'rxjs';
-import { catchError, map, scan, shareReplay, switchMap } from 'rxjs/operators';
+import { Observable, concat, of, forkJoin, defer } from 'rxjs';
+import { catchError, map, scan, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 // Response shapes defined in Cash Balance OpenAPI 1.4.0.
 export type CatalogKind = 'Category' | 'Brand' | 'Store';
@@ -15,13 +15,13 @@ export interface EntryPage { items: AccountEntry[]; page: number; size: number; 
 export interface EntryFilters { walletId?: number; categoryId?: number; typeId?: number; search?: string; from?: string; to?: string; page?: number; size?: number; sortBy?: 'date' | 'amount' | 'id'; direction?: 'asc' | 'desc'; }
 export interface Resource<T> { loading: boolean; data?: T; error?: string; }
 
-export function resource<P, T>(trigger: Observable<P>, fetch: (params: P) => Observable<T>): Observable<Resource<T>> {
+export function resource<P, T>(trigger: Observable<P>, fetch: (params: P) => Observable<T>, cached?: (params: P) => T | undefined): Observable<Resource<T>> {
   return trigger.pipe(
     switchMap(params => concat(
-      of<Resource<T>>({ loading: true }),
+      of<Resource<T>>({ loading: true, data: cached?.(params) }),
       fetch(params).pipe(map(data => ({ loading: false, data })), catchError(() => of<Resource<T>>({ loading: false, error: 'We could not load your data. Please try again.' })))
     )),
-    scan((previous: Resource<T>, next: Resource<T>) => next.loading ? { loading: true, data: previous.data } : next, { loading: true }),
+    scan((previous: Resource<T>, next: Resource<T>) => next.loading || next.error ? { ...next, data: next.data ?? previous.data } : next, { loading: true }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
 }
@@ -33,6 +33,36 @@ export function yearToDate(now = new Date()) {
 
 @Injectable({ providedIn: 'root' })
 export class CashBalanceService {
+  private readonly views = new Map<string, { data: unknown; savedAt: number }>();
+  private cacheToken: string | null = null;
+  private cacheRevision = 0;
+
+  private clearViews() { this.views.clear(); this.cacheRevision++; }
+  private syncSession() {
+    const token = localStorage.getItem('auth_token');
+    if (token !== this.cacheToken) { this.clearViews(); this.cacheToken = token; }
+  }
+
+  view<P, T>(name: string, trigger: Observable<P>, fetch: (params: P) => Observable<T>): Observable<Resource<T>> {
+    const key = (params: P) => `${name}:${JSON.stringify(params)}`;
+    return resource(trigger, params => defer(() => {
+      this.syncSession();
+      const revision = this.cacheRevision;
+      const token = this.cacheToken;
+      return fetch(params).pipe(tap(data => {
+        this.syncSession();
+        if (revision !== this.cacheRevision || token !== this.cacheToken) return;
+        this.views.delete(key(params));
+        this.views.set(key(params), { data, savedAt: Date.now() });
+        if (this.views.size > 20) this.views.delete(this.views.keys().next().value!);
+      }));
+    }), params => {
+      this.syncSession();
+      const saved = this.views.get(key(params));
+      return saved && Date.now() - saved.savedAt < 300_000 ? saved.data as T : undefined;
+    });
+  }
+
   constructor(private http: HttpClient, private configuration: Configuration) {}
   private get<T>(path: string, filters: object = {}): Observable<T> {
     let params = new HttpParams();
@@ -46,7 +76,7 @@ export class CashBalanceService {
   private write<T>(method: 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown) {
     const token = localStorage.getItem('auth_token');
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-    return this.http.request<T>(method, `${this.configuration.basePath?.replace(/\/$/, '')}${path}`, { body, headers });
+    return this.http.request<T>(method, `${this.configuration.basePath?.replace(/\/$/, '')}${path}`, { body, headers }).pipe(tap(() => this.clearViews()));
   }
   changePassword(currentPassword: string, newPassword: string) {
     return this.write<void>('POST', '/change-password', { currentPassword, newPassword });
@@ -75,16 +105,10 @@ export class CashBalanceService {
   deleteCatalog(kind: CatalogKind, id: number) { return this.write<void>('DELETE', `/delete${kind}/${id}`); }
   brands() { return this.get<Brand[]>('/getBrands'); }
   stores() { return this.get<Store[]>('/getStores'); }
-  createEntry(entry: AccountEntry) {
-    const token = localStorage.getItem('auth_token');
-    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-    return this.http.post<AccountEntry>(`${this.configuration.basePath?.replace(/\/$/, '')}/createAccountEntry`, entry, { headers });
-  }
-  createWallet(wallet: Pick<Wallet, 'name' | 'comment'>) {
-    const token = localStorage.getItem('auth_token');
-    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-    return this.http.post<Wallet>(`${this.configuration.basePath?.replace(/\/$/, '')}/wallets`, wallet, { headers });
-  }
+  updateEntry(entry: AccountEntry) { return this.write<AccountEntry>('PUT', '/updateAccountEntry', entry); }
+  deleteEntry(id: number) { return this.write<void>('DELETE', `/deleteAccountEntry/${id}`); }
+  createEntry(entry: AccountEntry) { return this.write<AccountEntry>('POST', '/createAccountEntry', entry); }
+  createWallet(wallet: Pick<Wallet, 'name' | 'comment'>) { return this.write<Wallet>('POST', '/wallets', wallet); }
   wallets() { return this.get<Wallet[]>('/wallets'); }
   categories() { return this.get<Category[]>('/getCategories'); }
   entries(filters: EntryFilters) { return this.get<EntryPage>('/account-entries', filters); }

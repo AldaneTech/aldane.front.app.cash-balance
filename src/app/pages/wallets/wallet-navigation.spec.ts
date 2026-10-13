@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { Subject, of } from 'rxjs';
-import { CashBalanceService, Summary } from '../../core/cash-balance.service';
+import { Subject, of, Observable } from 'rxjs';
+import { resource, CashBalanceService, Summary } from '../../core/cash-balance.service';
 import { walletRouteMatcher } from '../../app-routing.module';
 import { WalletsComponent } from './wallets.component';
 
@@ -16,6 +16,7 @@ describe('Wallet navigation', () => {
     const pending = new Subject<Summary>();
     const wallets = [{ id: 1, name: 'Daily', budget: 100, status: { id: 1 } }, { id: 2, name: 'Savings', budget: 0, status: { id: 1 } }];
     const api = {
+      view: (_name: string, trigger: Observable<any>, fetch: (params: any) => Observable<any>) => resource(trigger, fetch),
       wallets: () => of(wallets.map(wallet => ({ ...wallet }))),
       summary: (_from: string, _to: string, id?: number) => id === 1 ? pending : of(totals),
       monthly: () => of([]), entries: () => of({ items: [] })

@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { of, Subject } from 'rxjs';
-import { CashBalanceService, CatalogItem } from '../../core/cash-balance.service';
+import { of, Subject, Observable } from 'rxjs';
+import { resource, CashBalanceService, CatalogItem } from '../../core/cash-balance.service';
 import { SettingsComponent } from './settings.component';
 
 describe('SettingsComponent', () => {
   async function setup() {
     const response = new Subject<CatalogItem>();
     const api = {
+      view: (_name: string, trigger: Observable<any>, fetch: (params: any) => Observable<any>) => resource(trigger, fetch),
       myCatalogs: jasmine.createSpy().and.returnValue(of({ Category: [], Brand: [], Store: [] })),
       saveCatalog: jasmine.createSpy().and.returnValue(response), deleteCatalog: jasmine.createSpy().and.returnValue(response)
     };

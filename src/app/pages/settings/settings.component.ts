@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { CashBalanceService, CatalogItem, CatalogKind, resource } from '../../core/cash-balance.service';
+import { CashBalanceService, CatalogItem, CatalogKind } from '../../core/cash-balance.service';
 
 @Component({
   selector: 'app-settings', standalone: true, imports: [CommonModule, FormsModule],
@@ -17,7 +17,7 @@ export class SettingsComponent {
   selected = this.tabs[0];
   search = '';
   private refresh = new BehaviorSubject<void>(undefined);
-  readonly view$ = resource(this.refresh, () => this.api.myCatalogs());
+  readonly view$;
   @ViewChild('editor', { static: true }) editor!: ElementRef<HTMLDialogElement>;
   creating = false;
   error = '';
@@ -26,7 +26,9 @@ export class SettingsComponent {
   draft: CatalogItem = {};
   operationKind: CatalogKind = 'Category';
   operationLabel = 'category';
-  constructor(private api: CashBalanceService) {}
+  constructor(private api: CashBalanceService) {
+    this.view$ = api.view('settings', this.refresh, () => api.myCatalogs());
+  }
   select(tab: typeof this.tabs[number]) { this.selected = tab; this.search = ''; this.success = ''; }
   visible(items: CatalogItem[]) {
     const query = this.search.trim().toLowerCase();

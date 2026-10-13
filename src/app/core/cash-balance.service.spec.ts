@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Configuration } from '@aldanetech/cash-balance-api-client-angular';
-import { CashBalanceService, yearToDate } from './cash-balance.service';
+import { BehaviorSubject, of, Subject } from 'rxjs';
+import { CashBalanceService, Resource, resource, yearToDate } from './cash-balance.service';
 
 describe('CashBalanceService', () => {
   afterEach(() => { TestBed.inject(HttpTestingController).verify(); localStorage.removeItem('auth_token'); });
@@ -32,4 +33,38 @@ describe('CashBalanceService', () => {
   it('restricts annual totals to the year through today', () => {
     expect(yearToDate(new Date('2026-10-12T10:00:00Z'))).toEqual({ year: 2026, from: '2026-01-01', to: '2026-10-12', monthCount: 10 });
   });
+  it('shows cached views immediately on return while fetching current data', () => {
+    const api = TestBed.inject(CashBalanceService);
+    api.view('test', of('all'), () => of({ total: 10 })).subscribe();
+    const response = new Subject<{ total: number }>();
+    const values: Resource<{ total: number }>[] = [];
+    api.view('test', of('all'), () => response).subscribe(value => values.push(value));
+    expect(values[0]).toEqual({ loading: true, data: { total: 10 } });
+    response.next({ total: 20 });
+    expect(values[1]).toEqual({ loading: false, data: { total: 20 } });
+  });
+  it('separates cached selections and invalidates them after writes or session changes', () => {
+    const api = TestBed.inject(CashBalanceService);
+    api.view('test', of(1), () => of('wallet-one')).subscribe();
+    const response = new Subject<string>();
+    let result: Resource<string> | undefined;
+    const check = (id: number) => api.view('test', of(id), () => response).subscribe(value => result = value);
+    check(2); expect(result?.data).toBeUndefined();
+    api.deleteEntry(10).subscribe();
+    TestBed.inject(HttpTestingController).expectOne('http://localhost/cash-balance/deleteAccountEntry/10').flush(null);
+    check(1); expect(result?.data).toBeUndefined();
+    api.view('test', of(1), () => of('old-session')).subscribe();
+    localStorage.setItem('auth_token', 'different-session');
+    check(1); expect(result?.data).toBeUndefined();
+  });
+  it('retains visible data if a background refresh fails', () => {
+    const trigger = new BehaviorSubject(0);
+    const response = new Subject<string>();
+    let result: Resource<string> | undefined;
+    resource(trigger, id => id === 0 ? of('visible') : response).subscribe(value => result = value);
+    trigger.next(1); response.error(new Error('Offline'));
+    expect(result?.data).toBe('visible'); expect(result?.error).toBeTruthy();
+    expect(result?.loading).toBeFalse();
+  });
+
 });

@@ -45,3 +45,14 @@
 }
 
 .movement-success{padding:16px 20px;margin:40px 0 20px;border-radius:12px;background:#edf6ee;color:#27642a;border:1px solid #c7dfc8}
+
+/* Loading feedback overlays the heading without moving financial panels. */
+.finance-page { position: relative; }
+.finance-page .view-loading {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  color: #d1e4cf;
+  font-size: 11px;
+  pointer-events: none;
+}

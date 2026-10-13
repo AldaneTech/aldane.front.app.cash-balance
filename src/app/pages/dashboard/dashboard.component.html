@@ -1,6 +1,6 @@
 <div class="finance-page" *ngIf="view$ | async as vm" [attr.aria-busy]="vm.loading">
   <header class="page-heading"><div><p class="eyebrow">YOUR FINANCES, AT A GLANCE</p><h1>Overview</h1><p>Your wallets and movements, all in one place.</p></div><span class="period-pill">◷ &nbsp; {{ period.from | date:'dd MMM':'UTC' }} — {{ period.to | date:'dd MMM yyyy':'UTC' }}</span></header>
-  <div *ngIf="vm.loading" class="loading-strip" role="status">Updating your overview…</div>
+  <div *ngIf="vm.loading" class="view-loading" role="status">Updating your overview…</div>
   <div *ngIf="vm.error" class="error-notice" role="alert">{{ vm.error }} <button (click)="reload()">Try again</button></div>
   <ng-container *ngIf="vm.data as data">
     <section class="stat-grid" aria-label="Annual financial summary">

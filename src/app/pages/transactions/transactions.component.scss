@@ -1,0 +1,10 @@
+.finance-page .movements-panel {
+  position: relative;
+  margin-inline: 24px;
+}
+
+@media (max-width: 640px) {
+  .finance-page .movements-panel {
+    margin-inline: 12px;
+  }
+}

@@ -1,15 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { Subject, of } from 'rxjs';
+import { Subject, of, Observable } from 'rxjs';
 import { Wallet } from '@aldanetech/cash-balance-api-client-angular';
-import { CashBalanceService } from '../../core/cash-balance.service';
+import { resource, CashBalanceService } from '../../core/cash-balance.service';
 import { WalletsComponent } from './wallets.component';
 
 describe('Wallet creation', () => {
   async function setup() {
     const response = new Subject<Wallet>();
     const api = {
+      view: (_name: string, trigger: Observable<any>, fetch: (params: any) => Observable<any>) => resource(trigger, fetch),
       createWallet: jasmine.createSpy().and.returnValue(response),
       wallets: jasmine.createSpy().and.returnValue(of([])),
       summary: () => of({ balance: 0, income: 0, expenses: 0, entryCount: 0 }),
