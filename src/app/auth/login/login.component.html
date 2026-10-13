@@ -1,12 +1,15 @@
 <!-- login.component.html -->
 <div class="h-screen w-screen flex bg-brand-background items-center justify-center">
   <div class="w-4/5 h-4/5 bg-white flex rounded-lg shadow-xl">
-    <div class="w-full lg:w-1/2 rounded-lg relative" [class.overflow-y-auto]="selected === 'SignUp'">
+    <div class="w-full lg:w-1/2 rounded-lg relative overflow-y-auto">
       <div class="flex flex-col items-center justify-center">
         <img src="assets/logo.webp" class="w-36" [ngClass]="selected === 'SignUp' ? 'mt-10' : 'mt-16'" alt="Logo CashBal">
-        <h2 class="text-4xl font-bold" [ngClass]="selected === 'SignUp' ? 'mt-10' : 'mt-32'">Welcome Back</h2>
-        <p class="text-gray-500 mt-4">Please enter your details</p>
+        <h2 class="mt-10 text-4xl font-bold">{{ selected === 'SignIn' ? 'Bienvenido' : 'Crear cuenta' }}</h2>
+        <p class="text-gray-500 mt-4">Gestiona tus ingresos y gastos en un solo lugar.</p>
 
+        <p *ngIf="passwordChanged" role="status" class="mx-5 mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">Contraseña actualizada. Inicia sesión con tu nueva contraseña.</p>
+        <p *ngIf="error" role="alert" class="mx-5 mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error }}</p>
+        <p *ngIf="success" role="status" class="mx-5 mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">{{ success }}</p>
         <div class="w-64 bg-gray-200 rounded-full p-1 relative flex mt-4">
           <div
             class="absolute top-1 left-1 w-1/2 h-[calc(100%-0.5rem)] bg-white rounded-full shadow-md transition-all duration-300"
@@ -14,23 +17,24 @@
 
           <!-- SignIn -->
           <button
-            (click)="select('SignIn')"
+            [disabled]="submitting" (click)="select('SignIn')"
             class="w-1/2 z-10 text-center py-2 font-medium transition-colors duration-300"
             [ngClass]="selected === 'SignIn' ? 'text-brand-secondary' : 'text-gray-500'">
-            Sign In
+            Iniciar sesión
           </button>
 
           <!-- SignUp -->
           <button
-            (click)="select('SignUp')"
+            [disabled]="submitting" (click)="select('SignUp')"
             class="w-1/2 z-10 text-center py-2 font-medium transition-colors duration-300"
             [ngClass]="selected === 'SignUp' ? 'text-brand-secondary' : 'text-gray-500'">
-          Sign Up
+          Crear cuenta
           </button>
         </div>
 
         <div *ngIf="selected === 'SignIn'" class="m-5">
-          <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="flex flex-col gap-4">
+          <form (ngSubmit)="loginForm.valid && onLogin()" #loginForm="ngForm" [attr.aria-busy]="submitting" class="flex flex-col gap-4">
+            <fieldset [disabled]="submitting" class="flex flex-col gap-4">
             <div class="relative w-full max-w-sm mt-4">
               <!-- Input real -->
               <input
@@ -39,9 +43,8 @@
                 name="username"
                 placeholder=" "
                 [(ngModel)]="username"
-                maxlength="20"
-                minlength="4"
-                maxlength="20"
+                required
+                autocomplete="username"
                 #usernameModel="ngModel"
                 class="peer w-full pl-16 pr-4 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
@@ -56,7 +59,7 @@
               </div>
 
                 <!-- Icono de validación ✅ -->
-              <div *ngIf="username.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+              <div *ngIf="!!username.trim()" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -65,7 +68,7 @@
               </div>
 
               <!-- Icono de validación ❌ -->
-              <div *ngIf="username.length < 4 && usernameModel.dirty || username.length < 4 && usernameModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+              <div *ngIf="!username.trim() && usernameModel.dirty || !username.trim() && usernameModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
                 <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
               </div>
 
@@ -76,7 +79,7 @@
                             peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
                             peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
-                Username
+                Usuario
               </label>
             </div>
 
@@ -91,6 +94,8 @@
                 placeholder=" "
                 [(ngModel)]="password"
                 #passwordModel="ngModel"
+                required
+                autocomplete="current-password"
                 class="peer w-full pl-16 pr-12 pt-6 pb-2 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
 
@@ -103,7 +108,7 @@
                 <div class="w-px h-8 bg-gray-300"></div>
               </div>
               <!-- Icono de validación ✅ -->
-              <div *ngIf="password.length > 3" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+              <div *ngIf="!!password" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8.01 8.01a1 1 0 01-1.414 0L3.293 10.707a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -112,7 +117,7 @@
               </div>
 
               <!-- Icono de validación ❌ -->
-              <div *ngIf="password.length < 4 && passwordModel.dirty || password.length < 4 && passwordModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+              <div *ngIf="!password && passwordModel.dirty || !password && passwordModel.touched" class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
                 <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x h-8 w-8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
               </div>
 
@@ -122,16 +127,18 @@
                             peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
                             peer-focus:top-2 peer-focus:text-sm peer-focus:text-gray-400 cursor-text pointer-events-none">
-                            Password
+                            Contraseña
               </label>
             </div>
-            <button type="submit" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition">Log In</button>
+            </fieldset>
+            <button type="submit" [disabled]="submitting || loginForm.invalid || !username.trim()" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition disabled:opacity-50">{{ submitting ? 'Entrando…' : 'Iniciar sesión' }}</button>
           </form>
         </div>
 
         <!-- Formulario de Registro -->
         <div *ngIf="selected === 'SignUp'" class="mt-6 mb-8 px-4 w-full max-w-sm">
-          <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="flex flex-col gap-4">
+          <form (ngSubmit)="registerForm.valid && onRegister()" #registerForm="ngForm" [attr.aria-busy]="submitting" class="flex flex-col gap-4">
+            <fieldset [disabled]="submitting" class="flex flex-col gap-4">
             <div class="relative w-full max-w-sm">
               <!-- Input real -->
               <input
@@ -142,7 +149,9 @@
                 [(ngModel)]="username"
                 maxlength="20"
                 minlength="4"
-                maxlength="20"
+                required
+                pattern=".*\S.*"
+                autocomplete="username"
                 #usernameModel="ngModel"
                 class="peer w-full pl-16 pr-12 pt-5 pb-2 text-base h-14 border rounded-md outline-none focus:ring-2 focus:ring-brand-lightmain transition placeholder-transparent"
               />
@@ -177,7 +186,7 @@
                             peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
                             peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
-                Username
+                Usuario
               </label>
             </div>
 
@@ -187,6 +196,7 @@
                 type="email"
                 id="email"
                 name="email"
+                autocomplete="email"
                 placeholder=" "
                 [(ngModel)]="email"
 
@@ -226,7 +236,7 @@
                             peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
                             peer-placeholder-shown:text-gray-400
                             peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
-                Email
+                Correo electrónico
               </label>
             </div>
             <div class="relative w-full max-w-sm">
@@ -262,11 +272,11 @@
               <label for="register-password" class="absolute left-16 top-2 text-gray-400 text-xs transition-all
                      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
                      peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
-                Password
+                Contraseña
               </label>
             </div>
             <p id="register-password-hint" class="text-xs text-gray-500" aria-live="polite">
-              Use at least 8 characters.
+              Usa al menos 8 caracteres y un máximo de 72 bytes.
             </p>
             <div class="relative w-full max-w-sm">
               <input
@@ -301,18 +311,17 @@
               <label for="confirm-password" class="absolute left-16 top-2 text-gray-400 text-xs transition-all
                      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
                      peer-focus:top-2 peer-focus:text-xs peer-focus:text-gray-400 cursor-text pointer-events-none">
-                Confirm Password
+                Confirmar contraseña
               </label>
             </div>
             <p id="confirm-password-hint" class="text-xs text-gray-500" aria-live="polite">
-              {{ (confirmPasswordModel.dirty || confirmPasswordModel.touched) && !(confirmPasswordModel.valid && confirmPassword === registerPassword) ? 'Passwords must match.' : 'Repeat your password.' }}
+              {{ (confirmPasswordModel.dirty || confirmPasswordModel.touched) && !(confirmPasswordModel.valid && confirmPassword === registerPassword) ? 'Las contraseñas deben coincidir.' : 'Repite tu contraseña.' }}
             </p>
-            <button type="submit" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition">Register</button>
+            </fieldset>
+            <p *ngIf="registerForm.dirty && registrationError" role="status" class="text-sm text-red-700">{{ registrationError }}</p>
+            <button type="submit" [disabled]="submitting || registerForm.invalid || !!registrationError" class="bg-brand-main text-white py-2 rounded-xl hover:bg-brand-secondary transition disabled:opacity-50">{{ submitting ? 'Creando cuenta…' : 'Crear cuenta' }}</button>
           </form>
         </div>
-      </div>
-      <div *ngIf="selected === 'SignIn'" class="hidden xl:flex absolute bottom-4 justify-center items-end w-3/4 left-1/2 -translate-x-1/2">
-        <p class="text-center p-4 text-gray-400 text-sm">Join the millions of smart investors who trust us to manage their finances. Log in to access your personalized dashboard, track your portfolio performance, and make informed investment decisions.</p>
       </div>
     </div>
     <div class="hidden lg:flex w-1/2 bg-[url('/assets/login.webp')] bg-cover bg-center rounded-lg">

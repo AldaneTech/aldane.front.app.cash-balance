@@ -40,7 +40,11 @@
           </button>
 
           <!-- Avatar + chevron -->
-          <button class="flex items-center gap-2 rounded-xl hover:bg-white/15 px-2 py-1.5 transition">
+          <div #profileMenu class="relative" (focusout)="closeOnFocusOut($event)">
+          <button #profileTrigger type="button" aria-label="Opciones de perfil"
+            aria-controls="profile-options" [attr.aria-expanded]="profileMenuOpen"
+            (click)="profileMenuOpen = !profileMenuOpen"
+            class="flex items-center gap-2 rounded-xl hover:bg-white/15 px-2 py-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
             <img
               class="h-8 w-8 rounded-full object-cover ring-2 ring-white/25"
               src="https://i.pravatar.cc/80?img=12"
@@ -50,6 +54,14 @@
               <path d="M6 9l6 6 6-6" />
             </svg>
           </button>
+          <div *ngIf="profileMenuOpen" id="profile-options" aria-label="Opciones de perfil"
+            class="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
+            <a routerLink="/profile" (click)="profileMenuOpen = false"
+              class="block px-4 py-3 text-sm text-brand-secondary hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none">Editar perfil</a>
+            <button type="button" (click)="logout()"
+              class="block w-full border-t border-gray-100 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 focus-visible:bg-red-50 focus-visible:outline-none">Cerrar sesión</button>
+          </div>
+          </div>
           </div>
           </div>
     </div>

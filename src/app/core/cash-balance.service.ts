@@ -48,6 +48,13 @@ export class CashBalanceService {
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
     return this.http.request<T>(method, `${this.configuration.basePath?.replace(/\/$/, '')}${path}`, { body, headers });
   }
+  changePassword(currentPassword: string, newPassword: string) {
+    return this.write<void>('POST', '/change-password', { currentPassword, newPassword });
+  }
+  profile() { return this.get<User>('/me'); }
+  updateProfile(user: Pick<User, 'id' | 'username' | 'email'>) {
+    return this.write<User>('PUT', '/updateUser', user);
+  }
   myCatalogs() {
     return this.get<User>('/me').pipe(switchMap(user => {
       if (!user.id) throw new Error('Authenticated user is missing');

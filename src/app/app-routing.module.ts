@@ -6,6 +6,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { TransactionsComponent } from './pages/transactions/transactions.component';
 import { WalletsComponent } from './pages/wallets/wallets.component';
 import { SettingsComponent } from './pages/settings/settings.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthGuard } from './auth/auth.guard';
 
 // Use one route configuration for the list and detail so Angular reuses the view.
@@ -21,6 +22,7 @@ const routes: Routes = [
     component: LayoutComponent,
     canActivate: [AuthGuard],
     children: [
+      { path: 'profile', component: ProfileComponent },
       { path: 'settings', component: SettingsComponent, canDeactivate: [(component: SettingsComponent) => !component.creating] },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'analytics', redirectTo: 'dashboard', pathMatch: 'full' },
