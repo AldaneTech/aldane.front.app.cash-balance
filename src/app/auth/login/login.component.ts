@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, UserService } from '@aldanetech/cash-balance-api-client-angular';
 import { AuthFrontService } from '../auth.service';
 
@@ -11,10 +11,12 @@ import { AuthFrontService } from '../auth.service';
 })
 export class LoginComponent {
   constructor(private router: Router, private authService: AuthService,
-    private authFrontService: AuthFrontService, private userService: UserService) {
+    private authFrontService: AuthFrontService, private userService: UserService, route: ActivatedRoute) {
+    this.sessionExpired = route.snapshot.queryParamMap.get('reason') === 'session-expired';
     this.passwordChanged = router.getCurrentNavigation()?.extras.state?.['passwordChanged'] === true;
   }
   readonly passwordChanged: boolean;
+  readonly sessionExpired: boolean;
   selected: 'SignIn' | 'SignUp' = 'SignIn';
   username = '';
   password = '';

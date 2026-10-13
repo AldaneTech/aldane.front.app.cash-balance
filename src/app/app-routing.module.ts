@@ -21,6 +21,7 @@ const routes: Routes = [
     path: '',
     component: LayoutComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       { path: 'profile', component: ProfileComponent },
       { path: 'settings', component: SettingsComponent, canDeactivate: [(component: SettingsComponent) => !component.creating] },

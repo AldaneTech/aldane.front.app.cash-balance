@@ -8,8 +8,9 @@ import { LoginComponent } from './auth/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { LayoutComponent } from './layout/layout.component';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { Configuration } from '@aldanetech/cash-balance-api-client-angular';
+import { SessionInterceptor } from './auth/session.interceptor';
 import { apiClientConfiguration } from './api-client-config';
 
 @NgModule({
@@ -27,6 +28,7 @@ import { apiClientConfiguration } from './api-client-config';
     HttpClientModule
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: SessionInterceptor, multi: true },
     {
       provide: Configuration,
       useFactory: apiClientConfiguration

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, convertToParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { of, Subject, throwError } from 'rxjs';
 import { AuthService, UserService } from '@aldanetech/cash-balance-api-client-angular';
@@ -21,6 +21,7 @@ describe('LoginComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [LoginComponent], imports: [FormsModule],
       providers: [
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({}) } } },
         { provide: AuthService, useValue: auth }, { provide: UserService, useValue: users },
         { provide: AuthFrontService, useValue: session }, { provide: Router, useValue: router }
       ]

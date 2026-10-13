@@ -19,7 +19,8 @@ export class AuthFrontService {
   decodeJwt(token: string): any {
     try {
       const payload = token.split('.')[1];
-      const decoded = atob(payload);
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(atob(normalized), character => character.charCodeAt(0)));
       return JSON.parse(decoded);
     } catch (e) {
       return null;
@@ -28,10 +29,10 @@ export class AuthFrontService {
   
   isTokenExpired(token: string): boolean {
     const decoded = this.decodeJwt(token);
-    if (!decoded || !decoded.exp) return true;
+    if (!decoded || typeof decoded.exp !== 'number' || !Number.isFinite(decoded.exp)) return true;
   
     const now = Math.floor(Date.now() / 1000); // segundos
-    return decoded.exp < now;
+    return decoded.exp <= now;
   }
 }
 

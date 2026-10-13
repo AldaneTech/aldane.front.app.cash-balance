@@ -7,6 +7,7 @@
         <h2 class="mt-10 text-4xl font-bold">{{ selected === 'SignIn' ? 'Bienvenido' : 'Crear cuenta' }}</h2>
         <p class="text-gray-500 mt-4">Gestiona tus ingresos y gastos en un solo lugar.</p>
 
+        <p *ngIf="sessionExpired" role="status" class="mx-5 mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">Tu sesión ha caducado. Inicia sesión de nuevo para continuar.</p>
         <p *ngIf="passwordChanged" role="status" class="mx-5 mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">Contraseña actualizada. Inicia sesión con tu nueva contraseña.</p>
         <p *ngIf="error" role="alert" class="mx-5 mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error }}</p>
         <p *ngIf="success" role="status" class="mx-5 mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">{{ success }}</p>

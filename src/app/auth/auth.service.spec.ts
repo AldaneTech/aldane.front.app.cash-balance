@@ -4,6 +4,8 @@ import { AuthFrontService } from './auth.service';
 describe('AuthFrontService', () => {
   let service: AuthFrontService;
 
+  afterEach(() => localStorage.removeItem('auth_token'));
+
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(AuthFrontService);
@@ -65,4 +67,17 @@ describe('AuthFrontService', () => {
     const validToken = 'header.' + btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 1000 })) + '.signature';
     expect(service.isTokenExpired(validToken)).toBeFalse();
   });
+  it('treats expiration at the current second and invalid expiration values as expired', () => {
+    spyOn(Date, 'now').and.returnValue(1000000);
+    for (const exp of [1000, '2000', null]) {
+      const token = 'header.' + btoa(JSON.stringify({ exp })) + '.signature';
+      expect(service.isTokenExpired(token)).toBeTrue();
+    }
+  });
+  it('decodes UTF-8 base64url JWT payloads', () => {
+    const bytes = new TextEncoder().encode(JSON.stringify({ sub: 'José', exp: 9999999999 }));
+    const payload = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    expect(service.decodeJwt('header.' + payload + '.signature')?.sub).toBe('José');
+  });
+
 });

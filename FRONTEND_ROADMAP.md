@@ -9,8 +9,8 @@ Base disponible: dashboard, creación y consulta de movimientos con filtros y pa
 | 1 | Completar el acceso | Registro funcional, errores visibles en login y bloqueo durante el envío. | Implementado; pendiente de validación con API real |
 | 2 | Editar y eliminar movimientos | Corregir importe, fecha, cartera y categoría; confirmar eliminación y actualizar saldos y gráficos. | Implementado salvo cambio de cartera; pendiente de validación con API real |
 | 3 | Gestionar carteras existentes | Editar nombre y descripción; archivar explicando el efecto sobre los movimientos. | Implementado; pendiente de validación con API real |
-| 4 | Gestionar la sesión caducada | Detectar respuestas 401, limpiar sesión y volver al login con un mensaje. | Pendiente |
-| 5 | Guiar al usuario nuevo | Estados vacíos con acciones para crear la primera cartera, categorías y movimiento. | Pendiente |
+| 4 | Gestionar la sesión caducada | Detectar respuestas 401, limpiar sesión y volver al login con un mensaje. | Implementado; pendiente de validación con API real |
+| 5 | Catálogos iniciales al registrarse | Crear categorías, tiendas y marcas por defecto propias de cada usuario, editables desde Settings. Lista pendiente de concretar. | Pendiente |
 | 6 | Unificar idioma y formatos | Unificar textos, fechas, importes y moneda. | Pendiente |
 | 7 | Cerrar la experiencia móvil | Revisar navegación, tablas, filtros, formularios y diálogos. | Pendiente |
 | 8 | Homogeneizar formularios y mensajes | Validaciones junto a campos, cargas, confirmaciones y protección ante cambios sin guardar. | Pendiente |
@@ -55,3 +55,18 @@ Verificación: compilación de desarrollo y comprobación de tipos de pruebas. S
 - Tras archivar se vuelve a todas las carteras y se recargan los datos. Las escrituras invalidan la caché de vistas.
 - Ajuste mínimo del backend: una descripción enviada vacía ahora se borra; si se omite se conserva.
 - Añadidas pruebas de edición, descripción vacía, reapertura, confirmación de archivado, errores y duplicados. Pendiente recorrido con API real y ejecución de Karma en un entorno que permita la conexión local.
+
+## Avance del punto 4 — 2026-10-13
+
+- Interceptor global: ante un 401 en la API protegida elimina el token y navega al login con un aviso de sesión caducada.
+- Login/registro mantienen sus propios errores; respuestas 403 y errores de conexión no cierran la sesión.
+- Evita redirecciones duplicadas y que un 401 tardío de una sesión anterior cierre una sesión nueva.
+- Guard también en rutas hijas: detecta y limpia tokens caducados al cambiar entre secciones.
+- Decodificación JWT compatible con base64url y UTF-8; expiración exacta y valores inválidos se consideran caducados.
+- Añadidas pruebas de interceptor, navegación y expiración. Compilación y tipos verificados; pendiente recorrido con API real y ejecución de Karma por la restricción local del entorno.
+
+## Revisión del punto 5 — 2026-10-13
+
+Se sustituye la guía inicial por la creación de catálogos por defecto al registrar un usuario. Los datos deben pertenecer al nuevo usuario y permitir edición y baja mediante Settings. No se crearán movimientos ni saldos ficticios.
+
+La creación debe realizarse en el backend junto con el usuario, dentro de una transacción. Antes de implementarlo hay que concretar los valores iniciales y revisar las restricciones de unicidad: las entidades actuales declaran los nombres de categorías, tiendas y marcas únicos globalmente, lo que impediría repetir los mismos valores para distintos usuarios. La unicidad debería ser por usuario y nombre, con la correspondiente migración de la base de datos existente.
