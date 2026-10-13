@@ -8,7 +8,7 @@ Base disponible: dashboard, creación y consulta de movimientos con filtros y pa
 | --- | --- | --- | --- |
 | 1 | Completar el acceso | Registro funcional, errores visibles en login y bloqueo durante el envío. | Implementado; pendiente de validación con API real |
 | 2 | Editar y eliminar movimientos | Corregir importe, fecha, cartera y categoría; confirmar eliminación y actualizar saldos y gráficos. | Implementado salvo cambio de cartera; pendiente de validación con API real |
-| 3 | Gestionar carteras existentes | Editar nombre y descripción; archivar explicando el efecto sobre los movimientos. | Pendiente |
+| 3 | Gestionar carteras existentes | Editar nombre y descripción; archivar explicando el efecto sobre los movimientos. | Implementado; pendiente de validación con API real |
 | 4 | Gestionar la sesión caducada | Detectar respuestas 401, limpiar sesión y volver al login con un mensaje. | Pendiente |
 | 5 | Guiar al usuario nuevo | Estados vacíos con acciones para crear la primera cartera, categorías y movimiento. | Pendiente |
 | 6 | Unificar idioma y formatos | Unificar textos, fechas, importes y moneda. | Pendiente |
@@ -46,3 +46,12 @@ Verificación: compilación de desarrollo y comprobación de tipos de pruebas. S
 - El backend recalcula el saldo en ambas operaciones; dashboard y detalle de cartera consultan sus datos al navegar a ellos.
 - Dependencia pendiente: la API prohíbe cambiar la cartera de un movimiento existente. El selector queda bloqueado y se explica en el formulario. Para habilitarlo hay que ampliar el backend para ajustar ambas carteras de forma atómica.
 - Compilación de desarrollo y tipos de pruebas verificados. Añadidas pruebas de edición, eliminación confirmada, bloqueo de duplicados y errores. Pendiente ejecución de Karma y recorrido con API real por la restricción de conexión local del entorno.
+
+## Avance del punto 3 — 2026-10-13
+
+- Acciones Edit wallet y Archive wallet en el detalle de cada cartera.
+- Formulario precargado para nombre y descripción, con reinicio seguro al cancelar y volver a abrir.
+- Confirmación de archivado: la API realiza una baja lógica, conserva los movimientos y excluye la cartera de las vistas y totales activos. No hay restauración disponible en el front.
+- Tras archivar se vuelve a todas las carteras y se recargan los datos. Las escrituras invalidan la caché de vistas.
+- Ajuste mínimo del backend: una descripción enviada vacía ahora se borra; si se omite se conserva.
+- Añadidas pruebas de edición, descripción vacía, reapertura, confirmación de archivado, errores y duplicados. Pendiente recorrido con API real y ejecución de Karma en un entorno que permita la conexión local.

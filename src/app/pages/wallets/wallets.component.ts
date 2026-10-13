@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { FormsModule, NgForm } from '@angular/forms';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, BehaviorSubject, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Wallet } from '@aldanetech/cash-balance-api-client-angular';
 import { CashBalanceService, yearToDate } from '../../core/cash-balance.service';
 import { MonthlyChartComponent } from '../../shared/monthly-chart.component';
 import { MovementTableComponent } from '../../shared/movement-table.component';
@@ -13,7 +14,7 @@ export class WalletsComponent {
   readonly period = yearToDate();
   private refresh = new BehaviorSubject<void>(undefined);
   readonly view$;
-  constructor(private api: CashBalanceService, route: ActivatedRoute) {
+  constructor(private api: CashBalanceService, route: ActivatedRoute, private router: Router) {
     this.view$ = this.api.view('wallets', combineLatest([route.paramMap.pipe(map(params => params.get('walletId'))), this.refresh]), ([params]) => {
       const walletId = params !== null ? Number(params) : undefined;
       const { from, to } = this.period;
@@ -22,15 +23,31 @@ export class WalletsComponent {
     });
   }
   @ViewChild('createDialog', { static: true }) createDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('walletForm') walletForm?: NgForm;
+  editing?: Wallet;
+  archiving = false;
   creating = false;
   createError = '';
   successMessage = '';
   draft = { name: '', comment: '' };
 
   openCreate() {
+    if (this.creating) return;
+    this.editing = undefined;
+    this.archiving = false;
     this.draft = { name: '', comment: '' };
+    this.walletForm?.resetForm(this.draft);
     this.createError = '';
     this.successMessage = '';
+    this.createDialog.nativeElement.showModal();
+  }
+  openEdit(wallet: Wallet, archiving = false) {
+    if (this.creating || !wallet.id) return;
+    this.editing = wallet;
+    this.archiving = archiving;
+    this.draft = { name: wallet.name ?? '', comment: wallet.comment ?? '' };
+    this.walletForm?.resetForm(this.draft);
+    this.createError = this.successMessage = '';
     this.createDialog.nativeElement.showModal();
   }
   closeCreate() {
@@ -45,15 +62,31 @@ export class WalletsComponent {
     if (this.creating) { event.preventDefault(); event.returnValue = ''; }
   }
   createWallet() {
-    if (this.creating || !this.draft.name.trim()) return;
+    if (this.creating) return;
+    if (this.archiving && this.editing?.id) {
+      this.creating = true;
+      this.createError = '';
+      this.api.archiveWallet(this.editing.id).subscribe({
+        next: () => {
+          this.creating = false;
+          this.closeCreate();
+          this.successMessage = 'Wallet archived. Its movements are preserved but excluded from active-wallet views and totals.';
+          this.router.navigate(['/wallets']).then(() => this.reload());
+        },
+        error: () => this.creationFailed()
+      });
+      return;
+    }
+    if (!this.draft.name.trim()) return;
     this.creating = true;
     this.createError = '';
-    this.api.createWallet({ name: this.draft.name.trim(), comment: this.draft.comment.trim() }).subscribe({
+    const payload = { name: this.draft.name.trim(), comment: this.draft.comment.trim() };
+    (this.editing ? this.api.updateWallet({ id: this.editing.id, ...payload }) : this.api.createWallet(payload)).subscribe({
       next: wallet => {
         if (!wallet?.id) { this.creationFailed(); return; }
         this.creating = false;
         this.closeCreate();
-        this.successMessage = 'Wallet created successfully.';
+        this.successMessage = this.editing ? 'Wallet updated successfully.' : 'Wallet created successfully.';
         this.reload();
       },
       error: () => this.creationFailed()
@@ -61,7 +94,7 @@ export class WalletsComponent {
   }
   private creationFailed() {
     this.creating = false;
-    this.createError = 'We could not create your wallet. Please try again.';
+    this.createError = `We could not ${this.archiving ? 'archive' : this.editing ? 'update' : 'create'} your wallet. Please try again.`;
   }
   trackWallet(_: number, wallet: { id?: number }) { return wallet.id; }
   reload() { this.refresh.next(); }

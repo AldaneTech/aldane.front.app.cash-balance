@@ -14,11 +14,12 @@ describe('Wallet navigation', () => {
   it('keeps the cards and chart mounted while loading a different wallet and returning to all wallets', async () => {
     const totals: Summary = { balance: 100, income: 100, expenses: 0, net: 100, entryCount: 1 };
     const pending = new Subject<Summary>();
+    const secondWallet = new Subject<Summary>();
     const wallets = [{ id: 1, name: 'Daily', budget: 100, status: { id: 1 } }, { id: 2, name: 'Savings', budget: 0, status: { id: 1 } }];
     const api = {
       view: (_name: string, trigger: Observable<any>, fetch: (params: any) => Observable<any>) => resource(trigger, fetch),
       wallets: () => of(wallets.map(wallet => ({ ...wallet }))),
-      summary: (_from: string, _to: string, id?: number) => id === 1 ? pending : of(totals),
+      summary: (_from: string, _to: string, id?: number) => id === 1 ? pending : id === 2 ? secondWallet : of(totals),
       monthly: () => of([]), entries: () => of({ items: [] })
     };
     await TestBed.configureTestingModule({
@@ -41,7 +42,18 @@ describe('Wallet navigation', () => {
     pending.next({ ...totals, balance: 42 }); pending.complete(); fixture.detectChanges();
     expect(root.querySelector('a[href="/wallets/1"]')).toBe(card);
     expect(card.classList.contains('selected-wallet')).toBeTrue();
+    const editButton = root.querySelector('.wallet-detail-actions .secondary-button') as HTMLButtonElement;
+    const archiveButton = root.querySelector('.wallet-detail-actions .archive-button') as HTMLButtonElement;
     await router.navigateByUrl('/wallets/2'); fixture.detectChanges();
+    expect(root.querySelector('.wallet-detail-actions .secondary-button')).toBe(editButton);
+    expect(root.querySelector('.wallet-detail-actions .archive-button')).toBe(archiveButton);
+    expect(editButton.disabled).toBeTrue();
+    expect(archiveButton.disabled).toBeTrue();
+    expect(root.querySelector('.wallet-detail-actions').classList.contains('refreshing')).toBeTrue();
+    secondWallet.next(totals); secondWallet.complete(); fixture.detectChanges();
+    expect(editButton.disabled).toBeFalse();
+    expect(archiveButton.disabled).toBeFalse();
+    expect(root.querySelector('.wallet-detail-actions .secondary-button')).toBe(editButton);
     await router.navigateByUrl('/wallets'); fixture.detectChanges();
     expect(root.querySelector('app-wallets')).toBe(view);
     expect(root.querySelector('app-monthly-chart')).toBe(chart);

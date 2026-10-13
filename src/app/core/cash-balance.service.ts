@@ -109,6 +109,8 @@ export class CashBalanceService {
   deleteEntry(id: number) { return this.write<void>('DELETE', `/deleteAccountEntry/${id}`); }
   createEntry(entry: AccountEntry) { return this.write<AccountEntry>('POST', '/createAccountEntry', entry); }
   createWallet(wallet: Pick<Wallet, 'name' | 'comment'>) { return this.write<Wallet>('POST', '/wallets', wallet); }
+  updateWallet(wallet: Pick<Wallet, 'id' | 'name' | 'comment'>) { return this.write<Wallet>('PUT', '/updateWallet', wallet); }
+  archiveWallet(id: number) { return this.write<void>('DELETE', `/deleteWallet/${id}`); }
   wallets() { return this.get<Wallet[]>('/wallets'); }
   categories() { return this.get<Category[]>('/getCategories'); }
   entries(filters: EntryFilters) { return this.get<EntryPage>('/account-entries', filters); }
