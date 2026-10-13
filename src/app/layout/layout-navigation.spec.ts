@@ -1,9 +1,9 @@
-import { of } from 'rxjs';
+import { filter, firstValueFrom, of } from 'rxjs';
 import { CashBalanceService } from '../core/cash-balance.service';
 import { I18nModule } from '../i18n/i18n.module';
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { LayoutComponent } from './layout.component';
 import { SectionComponent } from '../pages/section/section.component';
@@ -31,6 +31,7 @@ describe('Main menu navigation', () => {
     }).compileComponents();
     const fixture = TestBed.createComponent(NavigationHostComponent);
     const router = TestBed.inject(Router);
+    const zone = TestBed.inject(NgZone);
     fixture.detectChanges();
     await router.navigateByUrl('/dashboard');
     fixture.detectChanges();
@@ -40,7 +41,11 @@ describe('Main menu navigation', () => {
 
     for (const path of ['transactions', 'wallets', 'settings', 'dashboard']) {
       const link = header.querySelector(`a[routerLinkActive][href="/${path}"]`) as HTMLAnchorElement;
-      link.click();
+      const navigation = firstValueFrom(router.events.pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+      ));
+      zone.run(() => link.click());
+      await navigation;
       await fixture.whenStable();
       fixture.detectChanges();
       expect(router.url).toBe(`/${path}`);
