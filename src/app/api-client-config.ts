@@ -1,7 +1,8 @@
 import { Configuration } from '@aldanetech/cash-balance-api-client-angular';
+import { environment } from '../environments/environment';
 
 export function apiClientConfiguration(): Configuration {
   return new Configuration({
-    basePath: 'http://localhost:8080/cash-balance'  // 🔁 AJUSTA SI CAMBIA
+    basePath: environment.apiUrl
   });
 }

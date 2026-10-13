@@ -1,3 +1,4 @@
+import { environment } from '../environments/environment';
 import { UnsavedChangesGuard } from './shared/forms/unsaved-changes.guard';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, UrlSegment, UrlMatchResult } from '@angular/router';
@@ -36,7 +37,7 @@ const routes: Routes = [
   { path: '**', redirectTo: '' }
 ];
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: environment.useHashRouting })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

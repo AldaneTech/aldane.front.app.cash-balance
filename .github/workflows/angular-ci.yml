@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: angular-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -29,4 +38,27 @@ jobs:
         run: npm test -- --watch=false --browsers=ChromeHeadless
 
       - name: Build Angular app
-        run: npm run build
+        run: npm run build -- --configuration production --base-href /aldane.front.app.cash-balance/
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/aldane.front.app.cash-balance/browser
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
