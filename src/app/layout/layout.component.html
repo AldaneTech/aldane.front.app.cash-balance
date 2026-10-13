@@ -20,42 +20,36 @@
           </div>
         </div>
 
-        <!-- Right: Icons + avatar -->
+        <!-- Account menu -->
         <div class="flex items-center gap-3">
-          <!-- Mail -->
-          <button class="relative grid h-9 w-9 place-items-center rounded-xl  hover:bg-white/15 transition">
-            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 6h16v12H4z" />
-              <path d="M4 7l8 6 8-6" />
-            </svg>
-          </button>
-
-          <!-- Bell with dot -->
-          <button class="relative grid h-9 w-9 place-items-center rounded-xl hover:bg-white/15 transition">
-            <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-400"></span>
-            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-              <path d="M13.73 21a2 2 0 01-3.46 0" />
-            </svg>
-          </button>
-
           <!-- Avatar + chevron -->
           <div #profileMenu class="relative" (focusout)="closeOnFocusOut($event)">
-          <button #profileTrigger type="button" [attr.aria-label]="'Opciones de perfil' | t"
+          <button #profileTrigger type="button" [attr.aria-label]="user?.username ? ('Profile options for {name}' | t:{ name: user?.username }) : ('Opciones de perfil' | t)"
             aria-controls="profile-options" [attr.aria-expanded]="profileMenuOpen"
             (click)="profileMenuOpen = !profileMenuOpen"
             class="flex items-center gap-2 rounded-xl hover:bg-white/15 px-2 py-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-            <img
-              class="h-8 w-8 rounded-full object-cover ring-2 ring-white/25"
-              src="https://i.pravatar.cc/80?img=12"
-              alt="avatar"
-            />
-            <svg class="h-4 w-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <span aria-hidden="true" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/15 text-xs font-semibold text-white ring-2 ring-white/25">
+              <ng-container *ngIf="initials; else accountIcon">{{ initials }}</ng-container>
+              <ng-template #accountIcon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0116 0v2"/></svg></ng-template>
+            </span>
+            <span class="hidden max-w-32 truncate text-sm font-medium text-white sm:block">{{ user?.username || ('Account' | t) }}</span>
+            <svg aria-hidden="true" class="h-4 w-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 9l6 6 6-6" />
             </svg>
           </button>
           <div *ngIf="profileMenuOpen" id="profile-options" [attr.aria-label]="'Opciones de perfil' | t"
-            class="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
+            class="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
+            <div class="border-b border-gray-100 px-4 py-3" [attr.aria-busy]="profileLoading">
+              <ng-container *ngIf="user">
+                <p class="truncate text-sm font-semibold text-brand-secondary">{{ user.username }}</p>
+                <p class="mt-1 truncate text-xs text-gray-500" [title]="user.email || ''">{{ user.email }}</p>
+              </ng-container>
+              <p *ngIf="profileLoading && !user" role="status" class="text-xs text-gray-500">{{ 'Loading account…' | t }}</p>
+              <div *ngIf="profileError" role="alert" class="text-xs text-red-700">
+                <p>{{ 'We could not load your account.' | t }}</p>
+                <button type="button" (click)="loadProfile()" class="mt-2 text-brand-main underline">{{ 'Try again' | t }}</button>
+              </div>
+            </div>
             <a routerLink="/profile" (click)="profileMenuOpen = false"
               class="block px-4 py-3 text-sm text-brand-secondary hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none">{{ 'Editar perfil' | t }}</a>
             <button type="button" (click)="logout()"

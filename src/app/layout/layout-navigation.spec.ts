@@ -17,7 +17,7 @@ class DashboardStubComponent {}
 describe('Main menu navigation', () => {
   it('keeps the same header and logo while navigating between child views', async () => {
     await TestBed.configureTestingModule({
-      providers: [{ provide: CashBalanceService, useValue: { preferences: () => of({ language: 'en' }) } }],
+      providers: [{ provide: CashBalanceService, useValue: { preferences: () => of({ language: 'en' }), profile: () => of({ id: 7, username: 'Alice Example', email: 'alice@example.com' }), profileUpdates$: of() } }],
       declarations: [NavigationHostComponent, LayoutComponent, DashboardStubComponent],
       imports: [I18nModule, RouterTestingModule.withRoutes([
         { path: '', component: LayoutComponent, children: [

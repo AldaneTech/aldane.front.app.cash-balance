@@ -15,7 +15,7 @@ Base disponible: dashboard, creación y consulta de movimientos con filtros y pa
 | 7 | Cerrar la experiencia móvil | Revisar navegación, tablas, filtros, formularios y diálogos. | Pendiente hasta publicar y probar desde un móvil |
 | 8 | Homogeneizar formularios y mensajes | Validaciones junto a campos, cargas, confirmaciones y protección ante cambios sin guardar. | Implementado; pendiente de validación visual |
 | 9 | Seleccionar el periodo del dashboard | Mes actual, año actual y rango personalizado compartido por indicadores y gráficos. | Pendiente |
-| 10 | Limpiar el menú superior | Datos reales del usuario; retirar correo y notificaciones hasta que sean funcionales. | Pendiente |
+| 10 | Limpiar el menú superior | Datos reales del usuario; retirar correo y notificaciones hasta que sean funcionales. | Implementado; pendiente de validación visual |
 | 11 | Recuperar contraseña | Solicitud por correo y establecimiento de nueva contraseña. Requiere backend y envío de emails. | Pendiente |
 | 12 | Verificar recorridos principales | Acceso → crear cartera → registrar movimiento → corregirlo → consultar saldo → cerrar sesión, con errores y teclado. | Pendiente |
 
@@ -94,3 +94,11 @@ Verificación del punto 6: compilaciones de desarrollo y producción correctas (
 - Punto 7 aplazado hasta publicar la aplicación y probar los estilos desde un móvil.
 
 Verificación del punto 8: compilación de desarrollo, tipos de pruebas y comprobaciones ejecutables de conservación/descarte de borradores, bloqueo durante escrituras, limpieza de formularios y validaciones de importes/contraseñas correctas. Las pruebas de interfaz en Karma siguen pendientes por la restricción de conexión local del entorno.
+
+## Avance del punto 10 — 2026-10-13
+
+- Retirados los botones de correo y notificaciones sin funcionalidad.
+- Sustituida la foto de ejemplo por iniciales del usuario autenticado, con icono neutro durante la carga o si no hay nombre disponible.
+- Nombre real en el menú superior y nombre/correo en el desplegable, usando `GET /me`. Los cambios de perfil se reflejan en el encabezado sin recargar.
+- Estado de carga y recuperación ante errores al consultar la cuenta. Textos de interfaz y accesibilidad disponibles en ambos idiomas.
+- Se conservan Editar perfil, Cerrar sesión y la protección de cambios sin guardar.

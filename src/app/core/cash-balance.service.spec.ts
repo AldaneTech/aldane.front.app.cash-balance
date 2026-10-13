@@ -67,4 +67,18 @@ describe('CashBalanceService', () => {
     expect(result?.loading).toBeFalse();
   });
 
+  it('notifies the header of profile changes but ignores late updates from an old session', () => {
+    const api = TestBed.inject(CashBalanceService);
+    const updates: any[] = [];
+    api.profileUpdates$.subscribe(user => updates.push(user));
+    localStorage.setItem('auth_token', 'session-one');
+    api.updateProfile({ id: 7, username: 'Updated', email: 'updated@example.com' }).subscribe();
+    TestBed.inject(HttpTestingController).expectOne('http://localhost/cash-balance/updateUser').flush({ id: 7, username: 'Updated', email: 'updated@example.com' });
+    expect(updates.length).toBe(1);
+    api.updateProfile({ id: 7, username: 'Late', email: 'late@example.com' }).subscribe();
+    localStorage.setItem('auth_token', 'session-two');
+    TestBed.inject(HttpTestingController).expectOne('http://localhost/cash-balance/updateUser').flush({ id: 7, username: 'Late' });
+    expect(updates.length).toBe(1);
+  });
+
 });

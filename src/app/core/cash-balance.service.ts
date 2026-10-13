@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Configuration, Wallet, AccountEntry, Category, Brand, Store, User } from '@aldanetech/cash-balance-api-client-angular';
-import { Observable, concat, of, forkJoin, defer } from 'rxjs';
+import { Observable, concat, of, forkJoin, defer, Subject } from 'rxjs';
 import { catchError, map, scan, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 // Response shapes defined in Cash Balance OpenAPI 1.4.0.
@@ -33,6 +33,8 @@ export function yearToDate(now = new Date()) {
 
 @Injectable({ providedIn: 'root' })
 export class CashBalanceService {
+  private readonly profileUpdates = new Subject<User>();
+  readonly profileUpdates$ = this.profileUpdates.asObservable();
   private readonly views = new Map<string, { data: unknown; savedAt: number }>();
   private cacheToken: string | null = null;
   private cacheRevision = 0;
@@ -85,7 +87,10 @@ export class CashBalanceService {
   updatePreferences(language: 'es' | 'en') { return this.write<{ language: 'es' | 'en' }>('PUT', '/me/preferences', { language }); }
   profile() { return this.get<User>('/me'); }
   updateProfile(user: Pick<User, 'id' | 'username' | 'email'>) {
-    return this.write<User>('PUT', '/updateUser', user);
+    const sessionToken = localStorage.getItem('auth_token');
+    return this.write<User>('PUT', '/updateUser', user).pipe(tap(updated => {
+      if (updated?.id && sessionToken === localStorage.getItem('auth_token')) this.profileUpdates.next(updated);
+    }));
   }
   myCatalogs() {
     return this.get<User>('/me').pipe(switchMap(user => {

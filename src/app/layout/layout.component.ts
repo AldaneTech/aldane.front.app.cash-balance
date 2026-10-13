@@ -1,3 +1,4 @@
+import { User } from '@aldanetech/cash-balance-api-client-angular';
 import { UnsavedChangesService } from '../shared/forms/unsaved-changes.service';
 import { Component, ElementRef, HostListener, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -13,6 +14,35 @@ import { Router } from '@angular/router';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   private preferencesRequest?: Subscription;
+  private profileRequest?: Subscription;
+  private profileUpdates?: Subscription;
+  user?: Pick<User, 'id' | 'username' | 'email'>;
+  profileLoading = true;
+  profileError = false;
+
+  get initials() {
+    const name = this.user?.username?.trim() ?? '';
+    const words = name.split(/\s+/).filter(Boolean);
+    return (words.length > 1 ? Array.from(words[0])[0] + Array.from(words[words.length - 1])[0] : Array.from(name).slice(0, 2).join('')).toLocaleUpperCase(this.i18n.locale);
+  }
+
+  loadProfile() {
+    this.profileRequest?.unsubscribe();
+    this.profileLoading = true;
+    this.profileError = false;
+    this.profileRequest = this.api.profile().subscribe({
+      next: user => {
+        if (!user?.id) { this.profileLoading = false; this.profileError = true; return; }
+        this.setUser(user);
+      },
+      error: () => { this.profileLoading = false; this.profileError = true; }
+    });
+  }
+  private setUser(user: User) {
+    this.user = { id: user.id, username: user.username, email: user.email };
+    this.profileLoading = false;
+    this.profileError = false;
+  }
   profileMenuOpen = false;
   @ViewChild('profileMenu') profileMenu?: ElementRef<HTMLElement>;
   @ViewChild('profileTrigger') profileTrigger?: ElementRef<HTMLButtonElement>;
@@ -44,10 +74,19 @@ export class LayoutComponent implements OnInit, OnDestroy {
   constructor(private auth: AuthFrontService, private router: Router, private api: CashBalanceService, private i18n: I18nService, private unsaved: UnsavedChangesService) {}
 
   ngOnInit() {
+    this.profileUpdates = this.api.profileUpdates$.subscribe(user => {
+      this.profileRequest?.unsubscribe();
+      this.setUser(user);
+    });
+    this.loadProfile();
     this.preferencesRequest = this.api.preferences().subscribe({ next: preferences => this.i18n.setLanguage(preferences.language), error: () => {} });
   }
 
-  ngOnDestroy() { this.preferencesRequest?.unsubscribe(); }
+  ngOnDestroy() {
+    this.preferencesRequest?.unsubscribe();
+    this.profileRequest?.unsubscribe();
+    this.profileUpdates?.unsubscribe();
+  }
 
   async logout() {
     if (!await this.unsaved.canLeave()) return;

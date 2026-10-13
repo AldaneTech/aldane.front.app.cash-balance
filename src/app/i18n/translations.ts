@@ -456,7 +456,11 @@ export const translations: Record<'es' | 'en', Record<string, string>> = {
     "Enter a value other than spaces.": "Introduce un valor que no contenga solo espacios.",
     "Use at least {count} characters.": "Usa al menos {count} caracteres.",
     "Use no more than {count} characters.": "Usa un máximo de {count} caracteres.",
-    "Enter a positive amount with up to two decimal places within the allowed limit.": "Introduce un importe positivo con un máximo de dos decimales dentro del límite permitido."
+    "Enter a positive amount with up to two decimal places within the allowed limit.": "Introduce un importe positivo con un máximo de dos decimales dentro del límite permitido.",
+    "Account": "Cuenta",
+    "Profile options for {name}": "Opciones de perfil de {name}",
+    "Loading account…": "Cargando cuenta…",
+    "We could not load your account.": "No se han podido cargar los datos de tu cuenta."
   },
   "en": {
     "Overview": "Overview",
@@ -915,6 +919,10 @@ export const translations: Record<'es' | 'en', Record<string, string>> = {
     "Enter a value other than spaces.": "Enter a value other than spaces.",
     "Use at least {count} characters.": "Use at least {count} characters.",
     "Use no more than {count} characters.": "Use no more than {count} characters.",
-    "Enter a positive amount with up to two decimal places within the allowed limit.": "Enter a positive amount with up to two decimal places within the allowed limit."
+    "Enter a positive amount with up to two decimal places within the allowed limit.": "Enter a positive amount with up to two decimal places within the allowed limit.",
+    "Account": "Account",
+    "Profile options for {name}": "Profile options for {name}",
+    "Loading account…": "Loading account…",
+    "We could not load your account.": "We could not load your account."
   }
 };
