@@ -81,6 +81,8 @@ export class CashBalanceService {
   changePassword(currentPassword: string, newPassword: string) {
     return this.write<void>('POST', '/change-password', { currentPassword, newPassword });
   }
+  preferences() { return this.get<{ language: 'es' | 'en' }>('/me/preferences'); }
+  updatePreferences(language: 'es' | 'en') { return this.write<{ language: 'es' | 'en' }>('PUT', '/me/preferences', { language }); }
   profile() { return this.get<User>('/me'); }
   updateProfile(user: Pick<User, 'id' | 'username' | 'email'>) {
     return this.write<User>('PUT', '/updateUser', user);

@@ -1,3 +1,5 @@
+import { I18nService } from '../../i18n/i18n.service';
+import { I18nModule } from '../../i18n/i18n.module';
 import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -17,10 +19,11 @@ describe('DashboardComponent', () => {
     };
     await TestBed.configureTestingModule({
       declarations: [DashboardComponent],
-      imports: [CommonModule, RouterTestingModule, MonthlyChartComponent],
+      imports: [I18nModule, CommonModule, RouterTestingModule, MonthlyChartComponent],
       providers: [{ provide: CashBalanceService, useValue: api }]
     }).compileComponents();
     const fixture = TestBed.createComponent(DashboardComponent);
+    TestBed.inject(I18nService).setLanguage('en');
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Overview');
     expect(api.summary).toHaveBeenCalledTimes(1);

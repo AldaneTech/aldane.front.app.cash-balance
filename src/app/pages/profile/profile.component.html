@@ -1,53 +1,66 @@
-<section class="mx-auto max-w-2xl rounded-2xl bg-white p-6 shadow-sm sm:p-8" [attr.aria-busy]="loading || saving">
-  <h1 class="text-2xl font-bold text-brand-secondary">Editar perfil</h1>
-  <p class="mt-2 text-sm text-gray-500">Actualiza tus datos personales.</p>
-  <p *ngIf="loading" role="status" class="mt-6 text-gray-500">Cargando perfil…</p>
-  <p *ngIf="error" role="alert" class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error }}</p>
-  <button *ngIf="!loading && !id" type="button" (click)="load()" class="mt-4 rounded-lg bg-brand-main px-4 py-2 text-white">Reintentar</button>
-  <form *ngIf="!loading && id" #profileForm="ngForm" (ngSubmit)="profileForm.valid && save()" class="mt-6 space-y-5">
-    <fieldset [disabled]="saving" class="space-y-5">
+<section class="mx-auto max-w-2xl rounded-2xl bg-white p-6 shadow-sm sm:p-8" [attr.aria-busy]="loading || busy">
+  <h1 class="text-2xl font-bold text-brand-secondary">{{ 'Editar perfil' | t }}</h1>
+  <p class="mt-2 text-sm text-gray-500">{{ 'Actualiza tus datos personales.' | t }}</p>
+  <p *ngIf="loading" role="status" class="mt-6 text-gray-500">{{ 'Cargando perfil…' | t }}</p>
+  <p *ngIf="error" role="alert" class="form-message form-message-error mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error | t }}</p>
+  <button *ngIf="!loading && !id" type="button" (click)="load()" class="mt-4 rounded-lg bg-brand-main px-4 py-2 text-white">{{ 'Reintentar' | t }}</button>
+  <form *ngIf="!loading && id" #profileForm="ngForm" [attr.aria-busy]="saving" appUnsavedForm [formBusy]="busy" (ngSubmit)="profileForm.valid && save()" class="mt-6 space-y-5">
+    <fieldset [disabled]="busy" class="space-y-5">
       <div>
-        <label for="profile-username" class="block text-sm font-medium text-brand-secondary">Nombre de usuario</label>
-        <input id="profile-username" name="username" [(ngModel)]="username" required pattern=".*\S.*" autocomplete="username"
+        <label for="profile-username" class="block text-sm font-medium text-brand-secondary">{{ 'Nombre de usuario' | t }}</label>
+        <input appFieldFeedback id="profile-username" name="username" [(ngModel)]="username" (ngModelChange)="success = false; error = ''" required pattern=".*\S.*" autocomplete="username"
           class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-main focus:outline-none focus:ring-2 focus:ring-brand-main/20">
       </div>
       <div>
-        <label for="profile-email" class="block text-sm font-medium text-brand-secondary">Correo electrónico</label>
-        <input id="profile-email" name="email" type="email" [(ngModel)]="email" required email autocomplete="email"
+        <label for="profile-email" class="block text-sm font-medium text-brand-secondary">{{ 'Correo electrónico' | t }}</label>
+        <input appFieldFeedback id="profile-email" name="email" type="email" [(ngModel)]="email" (ngModelChange)="success = false; error = ''" required email autocomplete="email"
           class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-main focus:outline-none focus:ring-2 focus:ring-brand-main/20">
       </div>
     </fieldset>
-    <p *ngIf="success" role="status" class="rounded-lg bg-green-50 p-3 text-sm text-green-700">Perfil actualizado correctamente.</p>
+    <p *ngIf="success" role="status" class="form-message form-message-success rounded-lg bg-green-50 p-3 text-sm text-green-700">{{ 'Perfil actualizado correctamente.' | t }}</p>
     <div class="flex items-center justify-end gap-3">
-      <a routerLink="/dashboard" class="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Volver</a>
-      <button type="submit" [disabled]="profileForm.invalid || saving" class="rounded-lg bg-brand-main px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{{ saving ? 'Guardando…' : 'Guardar cambios' }}</button>
+      <a routerLink="/dashboard" class="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">{{ 'Volver' | t }}</a>
+      <button type="submit" [disabled]="profileForm.invalid || busy" class="rounded-lg bg-brand-main px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{{ saving ? ('Guardando…' | t) : ('Guardar cambios' | t) }}</button>
     </div>
   </form>
   <div *ngIf="!loading && id" class="mt-8 border-t border-gray-200 pt-6">
-    <h2 class="text-xl font-semibold text-brand-secondary">Cambiar contraseña</h2>
-    <p id="password-help" class="mt-2 text-sm text-gray-500">Usa al menos 8 caracteres, con un máximo de 72 bytes. Al cambiarla tendrás que iniciar sesión de nuevo.</p>
-    <form #passwordForm="ngForm" (ngSubmit)="changePassword(passwordForm)" class="mt-5 space-y-5" [attr.aria-busy]="changingPassword">
-      <fieldset [disabled]="changingPassword" class="space-y-5">
+    <h2 class="text-xl font-semibold text-brand-secondary">{{ 'Language' | t }}</h2>
+    <p class="mt-2 text-sm text-gray-500">{{ 'Choose your language. Dates and amounts will use its formats.' | t }}</p>
+    <form #languageForm="ngForm" appUnsavedForm [formBusy]="busy" (ngSubmit)="saveLanguage()" class="mt-4 space-y-4" [attr.aria-busy]="languageLoading || busy">
+      <label for="profile-language" class="block text-sm font-medium text-brand-secondary">{{ 'Language' | t }}</label>
+      <select appFieldFeedback id="profile-language" name="language" [(ngModel)]="language" (ngModelChange)="languageSaved = false; languageError = ''" [disabled]="languageLoading || busy" class="w-full rounded-lg border border-gray-300 px-3 py-2">
+        <option value="es">Español</option><option value="en">English</option>
+      </select>
+      <p *ngIf="languageError" role="alert" class="form-message form-message-error text-sm text-red-700">{{ languageError | t }}</p>
+      <button *ngIf="languageError" type="button" (click)="loadLanguage()" class="text-sm text-brand-main">{{ 'Try again' | t }}</button>
+      <p *ngIf="languageSaved" role="status" class="form-message form-message-success text-sm text-green-700">{{ 'Language saved.' | t }}</p>
+      <button type="submit" [disabled]="languageLoading || busy" class="rounded-lg bg-brand-main px-4 py-2 text-sm text-white disabled:opacity-50">{{ (languageSaving ? 'Saving…' : 'Save language') | t }}</button>
+    </form>
+  </div>
+  <div *ngIf="!loading && id" class="mt-8 border-t border-gray-200 pt-6">
+    <h2 class="text-xl font-semibold text-brand-secondary">{{ 'Cambiar contraseña' | t }}</h2>
+    <p id="password-help" class="mt-2 text-sm text-gray-500">{{ 'Usa al menos 8 caracteres, con un máximo de 72 bytes. Al cambiarla tendrás que iniciar sesión de nuevo.' | t }}</p>
+    <form #passwordForm="ngForm" appUnsavedForm [formBusy]="busy" (ngSubmit)="changePassword(passwordForm)" class="mt-5 space-y-5" [attr.aria-busy]="changingPassword">
+      <fieldset [disabled]="busy" class="space-y-5">
         <div>
-          <label for="current-password" class="block text-sm font-medium text-brand-secondary">Contraseña actual</label>
-          <input id="current-password" name="currentPassword" type="password" [(ngModel)]="currentPassword" required autocomplete="current-password"
+          <label for="current-password" class="block text-sm font-medium text-brand-secondary">{{ 'Contraseña actual' | t }}</label>
+          <input appFieldFeedback id="current-password" name="currentPassword" [fieldMessage]="currentPassword && currentPasswordTooLong ? 'The current password exceeds the 72-byte limit.' : ''" type="password" [(ngModel)]="currentPassword" (ngModelChange)="passwordError = ''" required autocomplete="current-password"
             class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-main focus:outline-none focus:ring-2 focus:ring-brand-main/20">
         </div>
         <div>
-          <label for="new-password" class="block text-sm font-medium text-brand-secondary">Nueva contraseña</label>
-          <input id="new-password" name="newPassword" type="password" [(ngModel)]="newPassword" required autocomplete="new-password" aria-describedby="password-help"
+          <label for="new-password" class="block text-sm font-medium text-brand-secondary">{{ 'Nueva contraseña' | t }}</label>
+          <input appFieldFeedback id="new-password" name="newPassword" appPassword [fieldMessage]="newPassword && newPassword === currentPassword ? 'The new password must differ from the current one.' : ''" type="password" [(ngModel)]="newPassword" (ngModelChange)="passwordError = ''" required autocomplete="new-password" aria-describedby="password-help"
             class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-main focus:outline-none focus:ring-2 focus:ring-brand-main/20">
         </div>
         <div>
-          <label for="confirm-password" class="block text-sm font-medium text-brand-secondary">Confirmar nueva contraseña</label>
-          <input id="confirm-password" name="confirmPassword" type="password" [(ngModel)]="confirmPassword" required autocomplete="new-password"
+          <label for="confirm-password" class="block text-sm font-medium text-brand-secondary">{{ 'Confirmar nueva contraseña' | t }}</label>
+          <input appFieldFeedback id="confirm-password" name="confirmPassword" [appMatches]="newPassword" type="password" [(ngModel)]="confirmPassword" (ngModelChange)="passwordError = ''" required autocomplete="new-password"
             class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-main focus:outline-none focus:ring-2 focus:ring-brand-main/20">
         </div>
       </fieldset>
-      <p *ngIf="passwordForm.dirty && passwordValidationError" role="status" class="text-sm text-red-700">{{ passwordValidationError }}</p>
-      <p *ngIf="passwordError" role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ passwordError }}</p>
+      <p *ngIf="passwordError" role="alert" class="form-message form-message-error rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ passwordError | t }}</p>
       <div class="flex justify-end">
-        <button type="submit" [disabled]="!!passwordValidationError || changingPassword" class="rounded-lg bg-brand-main px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{{ changingPassword ? 'Cambiando…' : 'Cambiar contraseña' }}</button>
+        <button type="submit" [disabled]="passwordForm.invalid || !!passwordValidationError || busy" class="rounded-lg bg-brand-main px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{{ changingPassword ? ('Cambiando…' | t) : ('Cambiar contraseña' | t) }}</button>
       </div>
     </form>
   </div>

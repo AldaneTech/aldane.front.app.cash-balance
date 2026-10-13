@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { UnsavedChangesService } from '../../shared/forms/unsaved-changes.service';
+import { Component, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, UserService } from '@aldanetech/cash-balance-api-client-angular';
@@ -11,10 +13,12 @@ import { AuthFrontService } from '../auth.service';
 })
 export class LoginComponent {
   constructor(private router: Router, private authService: AuthService,
-    private authFrontService: AuthFrontService, private userService: UserService, route: ActivatedRoute) {
+    private authFrontService: AuthFrontService, private userService: UserService, route: ActivatedRoute, private unsaved: UnsavedChangesService) {
     this.sessionExpired = route.snapshot.queryParamMap.get('reason') === 'session-expired';
     this.passwordChanged = router.getCurrentNavigation()?.extras.state?.['passwordChanged'] === true;
   }
+  @ViewChild('loginForm') loginForm?: NgForm;
+  @ViewChild('registerForm') registerForm?: NgForm;
   readonly passwordChanged: boolean;
   readonly sessionExpired: boolean;
   selected: 'SignIn' | 'SignUp' = 'SignIn';
@@ -28,10 +32,12 @@ export class LoginComponent {
   success = '';
 
   select(option: 'SignIn' | 'SignUp') {
-    if (this.submitting) return;
-    this.selected = option;
-    this.error = this.success = '';
-    this.password = this.registerPassword = this.confirmPassword = '';
+    if (this.submitting || option === this.selected) return;
+    this.unsaved.close(this.selected === 'SignIn' ? this.loginForm : this.registerForm, false, () => {
+      this.selected = option;
+      this.error = this.success = '';
+      this.password = this.registerPassword = this.confirmPassword = '';
+    });
   }
 
   get registrationError(): string {
@@ -58,6 +64,7 @@ export class LoginComponent {
           this.error = 'No se ha podido iniciar sesión. Inténtalo de nuevo.';
           return;
         }
+        this.loginForm?.form.markAsPristine();
         this.authFrontService.login(response.token);
         this.password = '';
         this.router.navigate(['/dashboard']);
@@ -88,6 +95,7 @@ export class LoginComponent {
         this.username = user.username ?? this.username.trim();
         this.password = this.registerPassword = this.confirmPassword = '';
         this.email = '';
+        this.registerForm?.form.markAsPristine();
         this.selected = 'SignIn';
         this.success = 'Cuenta creada correctamente. Ya puedes iniciar sesión.';
       },

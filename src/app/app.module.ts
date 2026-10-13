@@ -1,3 +1,6 @@
+import { FormUiModule } from './shared/forms/form-ui.module';
+import { ConfirmationDialogComponent } from './shared/forms/confirmation-dialog.component';
+import { I18nModule } from './i18n/i18n.module';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -21,6 +24,9 @@ import { apiClientConfiguration } from './api-client-config';
     LayoutComponent
   ],
   imports: [
+    I18nModule,
+    FormUiModule,
+    ConfirmationDialogComponent,
     BrowserModule,
     MonthlyChartComponent,
     AppRoutingModule,

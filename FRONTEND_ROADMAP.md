@@ -11,9 +11,9 @@ Base disponible: dashboard, creación y consulta de movimientos con filtros y pa
 | 3 | Gestionar carteras existentes | Editar nombre y descripción; archivar explicando el efecto sobre los movimientos. | Implementado; pendiente de validación con API real |
 | 4 | Gestionar la sesión caducada | Detectar respuestas 401, limpiar sesión y volver al login con un mensaje. | Implementado; pendiente de validación con API real |
 | 5 | Catálogos iniciales al registrarse | Crear categorías, tiendas y marcas por defecto propias de cada usuario, editables desde Settings. Lista pendiente de concretar. | Pendiente |
-| 6 | Unificar idioma y formatos | Unificar textos, fechas, importes y moneda. | Pendiente |
-| 7 | Cerrar la experiencia móvil | Revisar navegación, tablas, filtros, formularios y diálogos. | Pendiente |
-| 8 | Homogeneizar formularios y mensajes | Validaciones junto a campos, cargas, confirmaciones y protección ante cambios sin guardar. | Pendiente |
+| 6 | Español e inglés y formatos locales | Selector en perfil, preferencia por usuario y textos, fechas e importes adaptados. Moneda EUR. | Implementado; pendiente de migración y validación con API real |
+| 7 | Cerrar la experiencia móvil | Revisar navegación, tablas, filtros, formularios y diálogos. | Pendiente hasta publicar y probar desde un móvil |
+| 8 | Homogeneizar formularios y mensajes | Validaciones junto a campos, cargas, confirmaciones y protección ante cambios sin guardar. | Implementado; pendiente de validación visual |
 | 9 | Seleccionar el periodo del dashboard | Mes actual, año actual y rango personalizado compartido por indicadores y gráficos. | Pendiente |
 | 10 | Limpiar el menú superior | Datos reales del usuario; retirar correo y notificaciones hasta que sean funcionales. | Pendiente |
 | 11 | Recuperar contraseña | Solicitud por correo y establecimiento de nueva contraseña. Requiere backend y envío de emails. | Pendiente |
@@ -70,3 +70,27 @@ Verificación: compilación de desarrollo y comprobación de tipos de pruebas. S
 Se sustituye la guía inicial por la creación de catálogos por defecto al registrar un usuario. Los datos deben pertenecer al nuevo usuario y permitir edición y baja mediante Settings. No se crearán movimientos ni saldos ficticios.
 
 La creación debe realizarse en el backend junto con el usuario, dentro de una transacción. Antes de implementarlo hay que concretar los valores iniciales y revisar las restricciones de unicidad: las entidades actuales declaran los nombres de categorías, tiendas y marcas únicos globalmente, lo que impediría repetir los mismos valores para distintos usuarios. La unicidad debería ser por usuario y nombre, con la correspondiente migración de la base de datos existente.
+
+## Avance del punto 6 — 2026-10-13
+
+- Catálogos de traducción para español e inglés: menú, acceso, perfil, resumen, movimientos, carteras, configuración, mensajes y accesibilidad.
+- Selector de idioma en el perfil con guardado independiente y confirmación. La preferencia se guarda en el backend y se carga al entrar a la aplicación; el navegador recuerda el último idioma para la pantalla de acceso.
+- Formatos `es-ES` y `en-GB` para importes en EUR, números, fechas y meses de gráficos. Las fechas se muestran en UTC para evitar cambios de día.
+- Los nombres y descripciones introducidos por el usuario no se traducen. Las fechas/importes enviados a la API conservan sus formatos de datos originales.
+- Endpoint autenticado `GET/PUT /me/preferences`, validación de idiomas y columna `user.language` con valor inicial `es`. Contrato documentado en OpenAPI.
+- Antes de desplegar el backend en una base existente hay que aplicar `db.changelog/migrate-user-language.sql`; también se incluye el changeset de Liquibase. No se ha modificado la base real.
+- Pruebas de preferencia, aislamiento de usuario, traducciones y formatos. Pendiente recorrido visual con API real y ejecución de Karma por la restricción de conexión local del entorno.
+
+Verificación del punto 6: compilaciones de desarrollo y producción correctas (producción mantiene avisos de presupuesto de tamaño), comprobación de tipos de tests, comprobación ejecutable de traducciones/formatos y 9 pruebas del backend superadas, incluyendo migración idempotente en H2 y consultas financieras. Las pruebas de interfaz en Karma siguen pendientes por la restricción de conexión local.
+
+## Avance del punto 8 — 2026-10-13
+
+- Validaciones compartidas junto a cada campo, con `aria-invalid`, descripción accesible y mensajes traducidos. Importes positivos con dos decimales, contraseñas por caracteres Unicode/bytes UTF-8 y confirmación que se revalida al cambiar la contraseña original.
+- Confirmación común «Seguir editando / Descartar cambios» al cancelar/cerrar diálogos, cambiar de vista y cerrar sesión. La recarga o cierre del navegador usa su aviso nativo.
+- Se conservan los borradores al cancelar la salida. Guardar correctamente marca solo el formulario correspondiente como guardado y no pide una segunda confirmación. Las búsquedas y filtros no se consideran borradores.
+- Se bloquean salidas durante las escrituras. La caducidad de sesión puede seguir redirigiendo al login.
+- Perfil, idioma y contraseña evitan escrituras simultáneas. El cambio de contraseña confirma antes de descartar cambios pendientes en el resto del perfil, porque cerrará la sesión.
+- Mensajes de error/éxito unificados. Los catálogos reinician el formulario con los valores correctos al abrirlo, igual que movimientos y carteras.
+- Punto 7 aplazado hasta publicar la aplicación y probar los estilos desde un móvil.
+
+Verificación del punto 8: compilación de desarrollo, tipos de pruebas y comprobaciones ejecutables de conservación/descarte de borradores, bloqueo durante escrituras, limpieza de formularios y validaciones de importes/contraseñas correctas. Las pruebas de interfaz en Karma siguen pendientes por la restricción de conexión local del entorno.

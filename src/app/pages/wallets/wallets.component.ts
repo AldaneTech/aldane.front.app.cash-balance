@@ -1,5 +1,8 @@
+import { UnsavedChangesService } from '../../shared/forms/unsaved-changes.service';
+import { FormUiModule } from '../../shared/forms/form-ui.module';
+import { I18nModule } from '../../i18n/i18n.module';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, BehaviorSubject, forkJoin } from 'rxjs';
@@ -9,12 +12,12 @@ import { CashBalanceService, yearToDate } from '../../core/cash-balance.service'
 import { MonthlyChartComponent } from '../../shared/monthly-chart.component';
 import { MovementTableComponent } from '../../shared/movement-table.component';
 
-@Component({ selector: 'app-wallets', standalone: true, imports: [CommonModule, FormsModule, RouterModule, MonthlyChartComponent, MovementTableComponent], templateUrl: './wallets.component.html', styleUrl: './wallets.component.scss' })
+@Component({ selector: 'app-wallets', standalone: true, imports: [FormUiModule, I18nModule, CommonModule, FormsModule, RouterModule, MonthlyChartComponent, MovementTableComponent], templateUrl: './wallets.component.html', styleUrl: './wallets.component.scss' })
 export class WalletsComponent {
   readonly period = yearToDate();
   private refresh = new BehaviorSubject<void>(undefined);
   readonly view$;
-  constructor(private api: CashBalanceService, route: ActivatedRoute, private router: Router) {
+  constructor(private api: CashBalanceService, route: ActivatedRoute, private router: Router, private unsaved: UnsavedChangesService) {
     this.view$ = this.api.view('wallets', combineLatest([route.paramMap.pipe(map(params => params.get('walletId'))), this.refresh]), ([params]) => {
       const walletId = params !== null ? Number(params) : undefined;
       const { from, to } = this.period;
@@ -51,15 +54,11 @@ export class WalletsComponent {
     this.createDialog.nativeElement.showModal();
   }
   closeCreate() {
-    if (!this.creating) this.createDialog.nativeElement.close();
+    this.unsaved.close(this.walletForm, this.creating, () => this.createDialog.nativeElement.close());
   }
   cancelCreate(event: Event) {
     event.preventDefault();
     this.closeCreate();
-  }
-  @HostListener('window:beforeunload', ['$event'])
-  preventUnload(event: BeforeUnloadEvent) {
-    if (this.creating) { event.preventDefault(); event.returnValue = ''; }
   }
   createWallet() {
     if (this.creating) return;
@@ -69,6 +68,7 @@ export class WalletsComponent {
       this.api.archiveWallet(this.editing.id).subscribe({
         next: () => {
           this.creating = false;
+          this.walletForm?.form.markAsPristine();
           this.closeCreate();
           this.successMessage = 'Wallet archived. Its movements are preserved but excluded from active-wallet views and totals.';
           this.router.navigate(['/wallets']).then(() => this.reload());
@@ -85,6 +85,7 @@ export class WalletsComponent {
       next: wallet => {
         if (!wallet?.id) { this.creationFailed(); return; }
         this.creating = false;
+        this.walletForm?.form.markAsPristine();
         this.closeCreate();
         this.successMessage = this.editing ? 'Wallet updated successfully.' : 'Wallet created successfully.';
         this.reload();

@@ -1,11 +1,15 @@
+import { UnsavedChangesService } from '../../shared/forms/unsaved-changes.service';
+import { FormUiModule } from '../../shared/forms/form-ui.module';
+import { I18nModule } from '../../i18n/i18n.module';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Wallet, Category, Store, Brand, AccountEntry } from '@aldanetech/cash-balance-api-client-angular';
+import { validMoney } from '../../shared/forms/validators.directive';
 import { CashBalanceService, yearToDate } from '../../core/cash-balance.service';
 
 @Component({
-  selector: 'app-create-movement', standalone: true, imports: [CommonModule, FormsModule],
+  selector: 'app-create-movement', standalone: true, imports: [FormUiModule, I18nModule, CommonModule, FormsModule],
   templateUrl: './create-movement.component.html',
   styleUrls: ['../wallets/wallets.component.scss', './create-movement.component.scss']
 })
@@ -25,7 +29,7 @@ export class CreateMovementComponent {
   busy = false;
   error = '';
   draft = this.emptyDraft();
-  constructor(private api: CashBalanceService) {}
+  constructor(private api: CashBalanceService, private unsaved: UnsavedChangesService) {}
   private emptyDraft(walletId?: number) {
     return { walletId, typeId: 2, amount: null as number | null, date: yearToDate().to, comment: '', categoryId: undefined as number | undefined, storeId: undefined as number | undefined, brandId: undefined as number | undefined };
   }
@@ -59,12 +63,8 @@ export class CreateMovementComponent {
       store: this.draft.storeId, brand: this.draft.brandId
     });
   }
-  close() { if (!this.busy) this.dialog.nativeElement.close(); }
+  close() { this.unsaved.close(this.form, this.busy, () => this.dialog.nativeElement.close()); }
   cancel(event: Event) { event.preventDefault(); this.close(); }
-  @HostListener('window:beforeunload', ['$event'])
-  preventUnload(event: BeforeUnloadEvent) {
-    if (this.busy) { event.preventDefault(); event.returnValue = ''; }
-  }
   private setBusy(value: boolean) { this.busy = value; this.busyChange.emit(value); }
   save() {
     if (this.busy) return;
@@ -72,13 +72,13 @@ export class CreateMovementComponent {
       this.error = '';
       this.setBusy(true);
       this.api.deleteEntry(this.editing.id).subscribe({
-        next: () => { this.setBusy(false); this.close(); this.deleted.emit(); },
+        next: () => { this.setBusy(false); this.form?.form.markAsPristine(); this.close(); this.deleted.emit(); },
         error: () => this.failed()
       });
       return;
     }
     const amount = Number(this.draft.amount);
-    if (!this.draft.walletId || !this.draft.date || !Number.isFinite(amount) || amount <= 0 || Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001) {
+    if (!this.draft.walletId || !this.draft.date || !validMoney(this.draft.amount)) {
       this.error = 'Choose a wallet, a date and an amount greater than zero with up to two decimal places.'; return;
     }
     this.error = '';
@@ -95,7 +95,7 @@ export class CreateMovementComponent {
     (this.editing ? this.api.updateEntry(payload) : this.api.createEntry(payload)).subscribe({
       next: entry => {
         if (!entry?.id) { this.failed(); return; }
-        this.setBusy(false); this.close(); (this.editing ? this.updated : this.created).emit();
+        this.setBusy(false); this.form?.form.markAsPristine(); this.close(); (this.editing ? this.updated : this.created).emit();
       },
       error: () => this.failed()
     });

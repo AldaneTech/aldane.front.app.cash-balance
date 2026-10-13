@@ -1,26 +1,26 @@
 <div class="finance-page settings-page" *ngIf="view$ | async as vm" [attr.aria-busy]="vm.loading">
-  <header class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>Settings</h1><p>Your categories, brands and stores, organized your way.</p></div><span class="period-pill">Personal workspace</span></header>
+  <header class="page-heading"><div><p class="eyebrow">{{ 'MAKE IT YOURS' | t }}</p><h1>{{ 'Settings' | t }}</h1><p>{{ 'Your categories, brands and stores, organized your way.' | t }}</p></div><span class="period-pill">{{ 'Personal workspace' | t }}</span></header>
   <section class="panel settings-panel">
-    <nav class="catalog-tabs" aria-label="Settings sections"><button *ngFor="let tab of tabs" type="button" [class.active]="selected.kind === tab.kind" [attr.aria-current]="selected.kind === tab.kind ? 'page' : null" (click)="select(tab)">{{ tab.label }}<span *ngIf="vm.data">{{ vm.data[tab.kind].length }}</span></button></nav>
-    <div class="panel-heading"><div><h2>{{ selected.label }}</h2><p>{{ selected.description }}</p></div><button type="button" class="primary-button" [disabled]="vm.loading || !vm.data" (click)="open()">+ Add {{ selected.singular }}</button></div>
-    <p *ngIf="success" class="catalog-success" role="status">{{ success }}</p>
-    <p class="catalog-loading" role="status"><span [style.visibility]="vm.loading ? 'visible' : 'hidden'">Updating your settings…</span></p>
-    <p *ngIf="vm.error" class="catalog-error" role="alert">{{ vm.error }} <button type="button" (click)="reload()">Try again</button></p>
+    <nav class="catalog-tabs" [attr.aria-label]="'Settings sections' | t"><button *ngFor="let tab of tabs" type="button" [class.active]="selected.kind === tab.kind" [attr.aria-current]="selected.kind === tab.kind ? 'page' : null" (click)="select(tab)">{{ tab.label | t }}<span *ngIf="vm.data">{{ vm.data[tab.kind].length | localNumber }}</span></button></nav>
+    <div class="panel-heading"><div><h2>{{ selected.label | t }}</h2><p>{{ selected.description | t }}</p></div><button type="button" class="primary-button" [disabled]="vm.loading || !vm.data" (click)="open()">{{ '+ Add {item}' | t:{ item: (selected.singular | t) } }}</button></div>
+    <p *ngIf="success" class="form-message form-message-success catalog-success" role="status">{{ success | t }}</p>
+    <p class="catalog-loading" role="status"><span [style.visibility]="vm.loading ? 'visible' : 'hidden'">{{ 'Updating your settings…' | t }}</span></p>
+    <p *ngIf="vm.error" class="form-message form-message-error catalog-error" role="alert">{{ vm.error | t }} <button type="button" (click)="reload()">{{ 'Try again' | t }}</button></p>
     <ng-container *ngIf="vm.data as data">
-      <label class="catalog-search">Search {{ selected.label.toLowerCase() }}<input type="search" [(ngModel)]="search" placeholder="Search by name or description…" /></label>
-      <div class="catalog-table"><table><thead><tr><th>Name</th><th>Description</th><th class="actions-column">Actions</th></tr></thead><tbody>
-        <tr *ngFor="let item of visible(data[selected.kind]); trackBy: trackItem"><td><strong>{{ item.name }}</strong></td><td>{{ item.comment || '—' }}</td><td class="actions-column"><button type="button" class="text-link" (click)="open(item)" [attr.aria-label]="'Edit ' + item.name">Edit</button><button type="button" class="remove-button" (click)="open(item, true)" [attr.aria-label]="'Remove ' + item.name">Remove</button></td></tr>
-        <tr *ngIf="!visible(data[selected.kind]).length"><td colspan="3" class="empty-copy">{{ search ? 'No results match your search.' : 'No ' + selected.label.toLowerCase() + ' yet. Add your first one to use it in movements.' }}</td></tr>
+      <label class="catalog-search">{{ 'Search {items}' | t:{ items: (selected.label | t) } }}<input appFieldFeedback type="search" [(ngModel)]="search" [placeholder]="'Search by name or description…' | t" /></label>
+      <div class="catalog-table"><table><thead><tr><th>{{ 'Name' | t }}</th><th>{{ 'Description' | t }}</th><th class="actions-column">{{ 'Actions' | t }}</th></tr></thead><tbody>
+        <tr *ngFor="let item of visible(data[selected.kind]); trackBy: trackItem"><td><strong>{{ item.name }}</strong></td><td>{{ item.comment || '—' }}</td><td class="actions-column"><button type="button" class="text-link" (click)="open(item)" [attr.aria-label]="'Edit {name}' | t:{ name: item.name }">{{ 'Edit' | t }}</button><button type="button" class="remove-button" (click)="open(item, true)" [attr.aria-label]="'Remove {name}' | t:{ name: item.name }">{{ 'Remove' | t }}</button></td></tr>
+        <tr *ngIf="!visible(data[selected.kind]).length"><td colspan="3" class="empty-copy">{{ search ? ('No results match your search.' | t) : ('No {items} yet. Add your first one to use it in movements.' | t:{ items: (selected.label | t) }) }}</td></tr>
       </tbody></table></div>
     </ng-container>
   </section>
 </div>
 <dialog #editor class="wallet-dialog" aria-labelledby="catalog-editor-title" [attr.aria-busy]="creating" (cancel)="cancel($event)">
-  <form #form="ngForm" (ngSubmit)="(deleting || form.valid) && submit()">
-    <div class="dialog-heading"><div><p class="eyebrow">PERSONAL SETTINGS</p><h2 id="catalog-editor-title">{{ deleting ? 'Remove' : draft.id ? 'Edit' : 'Add' }} {{ operationLabel }}</h2></div><button type="button" class="dialog-close" aria-label="Close" [disabled]="creating" (click)="close()">×</button></div>
-    <p *ngIf="deleting" class="dialog-description">Remove “{{ draft.name }}” from the options for new movements? Existing movements will keep their information.</p>
-    <fieldset *ngIf="!deleting" [disabled]="creating"><label for="catalog-name">Name *</label><input id="catalog-name" name="name" [(ngModel)]="draft.name" required maxlength="255" pattern=".*\S.*" autofocus /><label for="catalog-comment">Description <span class="optional">(optional)</span></label><textarea id="catalog-comment" name="comment" [(ngModel)]="draft.comment" maxlength="255" rows="3"></textarea></fieldset>
-    <p *ngIf="error" class="dialog-error" role="alert">{{ error }}</p><p *ngIf="creating" class="dialog-progress" role="status">Saving your changes… Please wait.</p>
-    <div class="dialog-actions"><button type="button" class="secondary-button" [disabled]="creating" (click)="close()">Cancel</button><button type="submit" class="primary-button" [disabled]="creating || (!deleting && (form.invalid || !draft.name?.trim()))">{{ creating ? 'Saving…' : deleting ? 'Remove' : 'Save' }}</button></div>
+  <form #form="ngForm" [appUnsavedForm]="editor.open" [formBusy]="creating" (ngSubmit)="(deleting || form.valid) && submit()">
+    <div class="dialog-heading"><div><p class="eyebrow">{{ 'PERSONAL SETTINGS' | t }}</p><h2 id="catalog-editor-title">{{ deleting ? ('Remove' | t) : draft.id ? ('Edit' | t) : ('Add' | t) }} {{ operationLabel | t }}</h2></div><button type="button" class="dialog-close" [attr.aria-label]="'Close' | t" [disabled]="creating" (click)="close()">×</button></div>
+    <p *ngIf="deleting" class="dialog-description">{{ 'Remove “{name}” from the options for new movements? Existing movements will keep their information.' | t:{ name: draft.name } }}</p>
+    <fieldset *ngIf="!deleting" [disabled]="creating"><label for="catalog-name">{{ 'Name *' | t }}</label><input appFieldFeedback id="catalog-name" name="name" [(ngModel)]="draft.name" required maxlength="255" pattern=".*\S.*" autofocus /><label for="catalog-comment">{{ 'Description' | t }} <span class="optional">{{ '(optional)' | t }}</span></label><textarea appFieldFeedback id="catalog-comment" name="comment" [(ngModel)]="draft.comment" maxlength="255" rows="3"></textarea></fieldset>
+    <p *ngIf="error" class="form-message form-message-error dialog-error" role="alert">{{ error | t }}</p><p *ngIf="creating" class="dialog-progress" role="status">{{ 'Saving your changes… Please wait.' | t }}</p>
+    <div class="dialog-actions"><button type="button" class="secondary-button" [disabled]="creating" (click)="close()">{{ 'Cancel' | t }}</button><button type="submit" class="primary-button" [disabled]="creating || (!deleting && (form.invalid || !draft.name?.trim()))">{{ creating ? ('Saving…' | t) : deleting ? ('Remove' | t) : ('Save' | t) }}</button></div>
   </form>
 </dialog>

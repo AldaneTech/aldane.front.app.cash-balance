@@ -1,3 +1,4 @@
+import { UnsavedChangesGuard } from './shared/forms/unsaved-changes.guard';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, UrlSegment, UrlMatchResult } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
@@ -23,12 +24,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      { path: 'profile', component: ProfileComponent },
-      { path: 'settings', component: SettingsComponent, canDeactivate: [(component: SettingsComponent) => !component.creating] },
+      { path: 'profile', component: ProfileComponent, canDeactivate: [UnsavedChangesGuard] },
+      { path: 'settings', component: SettingsComponent, canDeactivate: [UnsavedChangesGuard] },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'analytics', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'transactions', component: TransactionsComponent, canDeactivate: [(component: TransactionsComponent) => !component.creating] },
-      { matcher: walletRouteMatcher, component: WalletsComponent, canDeactivate: [(component: WalletsComponent) => !component.creating] },
+      { path: 'transactions', component: TransactionsComponent, canDeactivate: [UnsavedChangesGuard] },
+      { matcher: walletRouteMatcher, component: WalletsComponent, canDeactivate: [UnsavedChangesGuard] },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

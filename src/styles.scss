@@ -56,3 +56,11 @@
   font-size: 11px;
   pointer-events: none;
 }
+
+.field-feedback { margin:6px 0 0; font-size:12px; line-height:1.5; color:#9b4f32; }
+.field-feedback[hidden] { display:none; }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color:#b65d40 !important; }
+
+.form-message { border-radius:10px; padding:12px 16px; font-size:13px; line-height:1.6; }
+.form-message-error { border:1px solid #ecd0c4; background:#fbefe9; color:#9b4f32; }
+.form-message-success { border:1px solid #c7dfc8; background:#edf6ee; color:#27642a; }

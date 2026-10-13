@@ -1,5 +1,5 @@
 <header>
-  <nav class="w-full bg-brand-main" aria-label="Main navigation">
+  <nav class="w-full bg-brand-main" [attr.aria-label]="'Main navigation' | t">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between gap-4">
         <!-- Left: Logo + links -->
@@ -15,7 +15,7 @@
                routerLinkActive="bg-white/15 text-white" [routerLinkActiveOptions]="{ exact: item.path !== '/wallets' }"
                ariaCurrentWhenActive="page"
                class="rounded-xl px-3 py-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-              {{ item.label }}
+              {{ item.label | t }}
             </a>
           </div>
         </div>
@@ -41,7 +41,7 @@
 
           <!-- Avatar + chevron -->
           <div #profileMenu class="relative" (focusout)="closeOnFocusOut($event)">
-          <button #profileTrigger type="button" aria-label="Opciones de perfil"
+          <button #profileTrigger type="button" [attr.aria-label]="'Opciones de perfil' | t"
             aria-controls="profile-options" [attr.aria-expanded]="profileMenuOpen"
             (click)="profileMenuOpen = !profileMenuOpen"
             class="flex items-center gap-2 rounded-xl hover:bg-white/15 px-2 py-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
@@ -54,12 +54,12 @@
               <path d="M6 9l6 6 6-6" />
             </svg>
           </button>
-          <div *ngIf="profileMenuOpen" id="profile-options" aria-label="Opciones de perfil"
+          <div *ngIf="profileMenuOpen" id="profile-options" [attr.aria-label]="'Opciones de perfil' | t"
             class="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
             <a routerLink="/profile" (click)="profileMenuOpen = false"
-              class="block px-4 py-3 text-sm text-brand-secondary hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none">Editar perfil</a>
+              class="block px-4 py-3 text-sm text-brand-secondary hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none">{{ 'Editar perfil' | t }}</a>
             <button type="button" (click)="logout()"
-              class="block w-full border-t border-gray-100 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 focus-visible:bg-red-50 focus-visible:outline-none">Cerrar sesión</button>
+              class="block w-full border-t border-gray-100 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 focus-visible:bg-red-50 focus-visible:outline-none">{{ 'Cerrar sesión' | t }}</button>
           </div>
           </div>
           </div>
@@ -70,7 +70,7 @@
          routerLinkActive="bg-white/15 text-white" [routerLinkActiveOptions]="{ exact: item.path !== '/wallets' }"
          ariaCurrentWhenActive="page"
          class="shrink-0 rounded-xl px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-        {{ item.label }}
+        {{ item.label | t }}
       </a>
     </div>
   </nav>

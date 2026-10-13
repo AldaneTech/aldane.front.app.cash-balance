@@ -1,3 +1,4 @@
+import { I18nService } from '../../i18n/i18n.service';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -23,6 +24,7 @@ describe('Wallet creation', () => {
       providers: [{ provide: CashBalanceService, useValue: api }, { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})) } }]
     }).compileComponents();
     const fixture = TestBed.createComponent(WalletsComponent);
+    TestBed.inject(I18nService).setLanguage('en');
     fixture.detectChanges();
     const component = fixture.componentInstance;
     const dialog = component.createDialog.nativeElement;

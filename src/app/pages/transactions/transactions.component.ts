@@ -1,3 +1,4 @@
+import { I18nModule } from '../../i18n/i18n.module';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -8,7 +9,7 @@ import { CashBalanceService, EntryFilters, yearToDate } from '../../core/cash-ba
 import { CreateMovementComponent } from './create-movement.component';
 import { MovementTableComponent } from '../../shared/movement-table.component';
 
-@Component({ selector: 'app-transactions', standalone: true, imports: [CommonModule, FormsModule, MovementTableComponent, CreateMovementComponent], templateUrl: './transactions.component.html', styleUrl: './transactions.component.scss' })
+@Component({ selector: 'app-transactions', standalone: true, imports: [I18nModule, CommonModule, FormsModule, MovementTableComponent, CreateMovementComponent], templateUrl: './transactions.component.html', styleUrl: './transactions.component.scss' })
 export class TransactionsComponent {
   readonly period = yearToDate();
   filters: EntryFilters = { from: this.period.from, to: this.period.to, page: 0, size: 10, sortBy: 'date', direction: 'desc' };

@@ -1,4 +1,8 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { UnsavedChangesService } from '../shared/forms/unsaved-changes.service';
+import { Component, ElementRef, HostListener, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { CashBalanceService } from '../core/cash-balance.service';
+import { I18nService } from '../i18n/i18n.service';
 import { AuthFrontService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 
@@ -7,7 +11,8 @@ import { Router } from '@angular/router';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit, OnDestroy {
+  private preferencesRequest?: Subscription;
   profileMenuOpen = false;
   @ViewChild('profileMenu') profileMenu?: ElementRef<HTMLElement>;
   @ViewChild('profileTrigger') profileTrigger?: ElementRef<HTMLButtonElement>;
@@ -36,9 +41,16 @@ export class LayoutComponent {
     { path: '/settings', label: 'Settings' }
   ];
 
-  constructor(private auth: AuthFrontService, private router: Router) {}
+  constructor(private auth: AuthFrontService, private router: Router, private api: CashBalanceService, private i18n: I18nService, private unsaved: UnsavedChangesService) {}
 
-  logout() {
+  ngOnInit() {
+    this.preferencesRequest = this.api.preferences().subscribe({ next: preferences => this.i18n.setLanguage(preferences.language), error: () => {} });
+  }
+
+  ngOnDestroy() { this.preferencesRequest?.unsubscribe(); }
+
+  async logout() {
+    if (!await this.unsaved.canLeave()) return;
     this.profileMenuOpen = false;
     this.auth.logout();
     this.router.navigate(['/login']);

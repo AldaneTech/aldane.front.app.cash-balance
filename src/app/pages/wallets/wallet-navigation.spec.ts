@@ -1,3 +1,4 @@
+import { I18nService } from '../../i18n/i18n.service';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -29,6 +30,7 @@ describe('Wallet navigation', () => {
     }).compileComponents();
     const fixture = TestBed.createComponent(WalletNavigationHost);
     const router = TestBed.inject(Router);
+    TestBed.inject(I18nService).setLanguage('en');
     fixture.detectChanges();
     await router.navigateByUrl('/wallets'); fixture.detectChanges();
     const root = fixture.nativeElement;

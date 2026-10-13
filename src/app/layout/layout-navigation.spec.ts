@@ -1,3 +1,6 @@
+import { of } from 'rxjs';
+import { CashBalanceService } from '../core/cash-balance.service';
+import { I18nModule } from '../i18n/i18n.module';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -14,8 +17,9 @@ class DashboardStubComponent {}
 describe('Main menu navigation', () => {
   it('keeps the same header and logo while navigating between child views', async () => {
     await TestBed.configureTestingModule({
+      providers: [{ provide: CashBalanceService, useValue: { preferences: () => of({ language: 'en' }) } }],
       declarations: [NavigationHostComponent, LayoutComponent, DashboardStubComponent],
-      imports: [RouterTestingModule.withRoutes([
+      imports: [I18nModule, RouterTestingModule.withRoutes([
         { path: '', component: LayoutComponent, children: [
           { path: 'dashboard', component: DashboardStubComponent },
           { path: 'analytics', component: SectionComponent, data: { title: 'Analytics' } },

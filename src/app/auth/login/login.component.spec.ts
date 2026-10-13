@@ -1,3 +1,5 @@
+import { FormUiModule } from '../../shared/forms/form-ui.module';
+import { I18nModule } from '../../i18n/i18n.module';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, ActivatedRoute, convertToParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +21,7 @@ describe('LoginComponent', () => {
     session = jasmine.createSpyObj('AuthFrontService', ['login']);
     router = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
     await TestBed.configureTestingModule({
-      declarations: [LoginComponent], imports: [FormsModule],
+      declarations: [LoginComponent], imports: [FormUiModule, I18nModule, FormsModule],
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({}) } } },
         { provide: AuthService, useValue: auth }, { provide: UserService, useValue: users },

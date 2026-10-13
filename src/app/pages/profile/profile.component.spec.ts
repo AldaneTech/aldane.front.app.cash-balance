@@ -1,3 +1,6 @@
+import { UnsavedChangesService } from '../../shared/forms/unsaved-changes.service';
+import { ConfirmationService } from '../../shared/forms/confirmation.service';
+import { I18nService } from '../../i18n/i18n.service';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -11,12 +14,15 @@ describe('Profile password change', () => {
   let auth: jasmine.SpyObj<AuthFrontService>;
   let router: jasmine.SpyObj<Router>;
   let form: jasmine.SpyObj<NgForm>;
+  let i18n: I18nService;
+  afterEach(() => localStorage.removeItem('cash_balance_language'));
   beforeEach(() => {
-    api = jasmine.createSpyObj('CashBalanceService', ['changePassword']);
+    api = jasmine.createSpyObj('CashBalanceService', ['changePassword', 'preferences', 'updatePreferences']);
     auth = jasmine.createSpyObj('AuthFrontService', ['logout']);
     router = jasmine.createSpyObj('Router', ['navigate']);
     form = jasmine.createSpyObj('NgForm', ['resetForm']);
-    component = new ProfileComponent(api, auth, router);
+    i18n = new I18nService();
+    component = new ProfileComponent(api, auth, router, i18n, new UnsavedChangesService(new ConfirmationService()));
     component.currentPassword = 'current-password';
     component.newPassword = component.confirmPassword = 'new-password';
   });
@@ -48,4 +54,22 @@ describe('Profile password change', () => {
     expect(component.changingPassword).toBeFalse();
     expect(auth.logout).not.toHaveBeenCalled();
   });
+  it('restores the saved account language and applies changes only after saving', () => {
+    api.preferences.and.returnValue(of({ language: 'en' }));
+    component.loadLanguage();
+    expect(component.language).toBe('en'); expect(i18n.language).toBe('en');
+    component.language = 'es';
+    api.updatePreferences.and.returnValue(of({ language: 'es' }));
+    component.saveLanguage();
+    expect(api.updatePreferences).toHaveBeenCalledWith('es');
+    expect(i18n.language).toBe('es'); expect(component.languageSaved).toBeTrue();
+  });
+  it('keeps the active language when saving fails', () => {
+    i18n.setLanguage('en'); component.language = 'es'; component.languageLoading = false;
+    api.updatePreferences.and.returnValue(throwError(() => ({ status: 500 })));
+    component.saveLanguage();
+    expect(i18n.language).toBe('en'); expect(component.languageSaving).toBeFalse();
+    expect(component.languageError).toBeTruthy(); expect(component.languageSaved).toBeFalse();
+  });
+
 });

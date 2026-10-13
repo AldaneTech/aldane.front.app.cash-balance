@@ -1,3 +1,4 @@
+import { ConfirmationDialogComponent } from './shared/forms/confirmation-dialog.component';
 import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
@@ -5,7 +6,7 @@ import { AppComponent } from './app.component';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
+      imports: [ConfirmationDialogComponent,
         RouterModule.forRoot([])
       ],
       declarations: [

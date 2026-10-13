@@ -1,3 +1,4 @@
+import { I18nService } from '../../i18n/i18n.service';
 import { TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
 import { AccountEntry } from '@aldanetech/cash-balance-api-client-angular';
@@ -10,6 +11,7 @@ describe('CreateMovementComponent', () => {
     const api = { createEntry: jasmine.createSpy().and.returnValue(response), updateEntry: jasmine.createSpy().and.returnValue(response), deleteEntry: jasmine.createSpy().and.returnValue(response) };
     await TestBed.configureTestingModule({ imports: [CreateMovementComponent], providers: [{ provide: CashBalanceService, useValue: api }] }).compileComponents();
     const fixture = TestBed.createComponent(CreateMovementComponent);
+    TestBed.inject(I18nService).setLanguage('en');
     fixture.detectChanges();
     const component = fixture.componentInstance;
     component.wallets = [{ id: 7, name: 'Daily' }];

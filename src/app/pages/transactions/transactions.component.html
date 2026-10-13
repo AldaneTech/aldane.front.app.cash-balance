@@ -1,21 +1,21 @@
 <div class="finance-page" *ngIf="view$ | async as vm" [attr.aria-busy]="vm.loading">
-  <header class="page-heading"><div><p class="eyebrow">YOUR MONEY IN MOTION</p><h1>Movements</h1><p>A clear view of every income and expense.</p></div><span class="period-pill">Filter by wallet and date</span></header>
-  <div *ngIf="successMessage" class="movement-success" role="status">{{ successMessage }}</div>
-  <div *ngIf="vm.loading" class="view-loading" role="status">Updating movements…</div>
-  <div *ngIf="vm.error" class="error-notice" role="alert">{{ vm.error }} <button (click)="reload()">Try again</button></div>
+  <header class="page-heading"><div><p class="eyebrow">{{ 'YOUR MONEY IN MOTION' | t }}</p><h1>{{ 'Movements' | t }}</h1><p>{{ 'A clear view of every income and expense.' | t }}</p></div><span class="period-pill">{{ 'Filter by wallet and date' | t }}</span></header>
+  <div *ngIf="successMessage" class="form-message form-message-success movement-success" role="status">{{ successMessage | t }}</div>
+  <div *ngIf="vm.loading" class="view-loading" role="status">{{ 'Updating movements…' | t }}</div>
+  <div *ngIf="vm.error" class="form-message form-message-error error-notice" role="alert">{{ vm.error | t }} <button (click)="reload()">{{ 'Try again' | t }}</button></div>
   <section class="panel movements-panel" *ngIf="vm.data as data">
-    <div class="panel-heading"><div><h2>All movements</h2><p>{{ data.entries.totalElements }} movements found</p></div><button type="button" class="primary-button" [disabled]="vm.loading || creating || !data.wallets.length" (click)="successMessage = ''; creator.open(filters.walletId)">+ Add movement</button></div>
-    <p *ngIf="!data.wallets.length" class="empty-copy">Create a wallet first to start adding movements.</p>
+    <div class="panel-heading"><div><h2>{{ 'All movements' | t }}</h2><p>{{ data.entries.totalElements | localNumber }} {{ 'movements found' | t }}</p></div><button type="button" class="primary-button" [disabled]="vm.loading || creating || !data.wallets.length" (click)="successMessage = ''; creator.open(filters.walletId)">{{ '+ Add movement' | t }}</button></div>
+    <p *ngIf="!data.wallets.length" class="empty-copy">{{ 'Create a wallet first to start adding movements.' | t }}</p>
     <app-create-movement #creator [wallets]="data.wallets" [categories]="data.categories" [brands]="data.brands" [stores]="data.stores" (busyChange)="creating = $event" (created)="movementCreated()" (updated)="movementChanged()" (deleted)="movementChanged(true)" />
     <form class="filter-grid" (ngSubmit)="apply()">
-      <label class="search-filter">Search<input name="search" [(ngModel)]="filters.search" placeholder="Search comments…" maxlength="200" /></label>
-      <label>Wallet<select name="wallet" [(ngModel)]="filters.walletId"><option [ngValue]="undefined">All wallets</option><option *ngFor="let wallet of data.wallets" [ngValue]="wallet.id">{{ wallet.name }}</option></select></label>
-      <label>Category<select name="category" [(ngModel)]="filters.categoryId"><option [ngValue]="undefined">All categories</option><option *ngFor="let category of data.categories" [ngValue]="category.id">{{ category.name }}</option></select></label>
-      <label>From<input type="date" name="from" [(ngModel)]="filters.from" /></label><label>To<input type="date" name="to" [(ngModel)]="filters.to" /></label>
-      <div class="filter-actions"><button type="submit" class="primary-button" [disabled]="vm.loading">Apply filters</button><button type="button" class="secondary-button" (click)="reset()">Reset</button></div>
+      <label class="search-filter">{{ 'Search' | t }}<input name="search" [(ngModel)]="filters.search" [placeholder]="'Search comments…' | t" maxlength="200" /></label>
+      <label>{{ 'Wallet' | t }}<select name="wallet" [(ngModel)]="filters.walletId"><option [ngValue]="undefined">{{ 'All wallets' | t }}</option><option *ngFor="let wallet of data.wallets" [ngValue]="wallet.id">{{ wallet.name }}</option></select></label>
+      <label>{{ 'Category' | t }}<select name="category" [(ngModel)]="filters.categoryId"><option [ngValue]="undefined">{{ 'All categories' | t }}</option><option *ngFor="let category of data.categories" [ngValue]="category.id">{{ category.name }}</option></select></label>
+      <label>{{ 'From' | t }}<input type="date" name="from" [(ngModel)]="filters.from" /></label><label>{{ 'To' | t }}<input type="date" name="to" [(ngModel)]="filters.to" /></label>
+      <div class="filter-actions"><button type="submit" class="primary-button" [disabled]="vm.loading">{{ 'Apply filters' | t }}</button><button type="button" class="secondary-button" (click)="reset()">{{ 'Reset' | t }}</button></div>
     </form>
-    <p *ngIf="dateError" class="expense-text" role="alert">{{ dateError }}</p>
+    <p *ngIf="dateError" class="form-message form-message-error expense-text" role="alert">{{ dateError | t }}</p>
     <app-movement-table [editable]="true" [busy]="creating || vm.loading" (edit)="successMessage = ''; creator.openEdit($event)" (remove)="successMessage = ''; creator.openEdit($event, true)" [entries]="data.entries.items" [sortBy]="data.filters.sortBy || 'date'" [direction]="data.filters.direction || 'desc'" (sort)="sort($event)" />
-    <footer class="pagination"><span>{{ data.entries.totalElements ? 'Page ' + (data.entries.page + 1) + ' of ' + data.entries.totalPages : 'No results' }}</span><div><button class="secondary-button" [disabled]="vm.loading || data.entries.page === 0" (click)="page(data.entries.page - 1)">← Previous</button><button class="secondary-button" [disabled]="vm.loading || data.entries.page + 1 >= data.entries.totalPages" (click)="page(data.entries.page + 1)">Next →</button></div></footer>
+    <footer class="pagination"><span>{{ data.entries.totalElements ? ('Page ' | t) + (data.entries.page + 1) + (' of ' | t) + data.entries.totalPages : ('No results' | t) }}</span><div><button class="secondary-button" [disabled]="vm.loading || data.entries.page === 0" (click)="page(data.entries.page - 1)">{{ '← Previous' | t }}</button><button class="secondary-button" [disabled]="vm.loading || data.entries.page + 1 >= data.entries.totalPages" (click)="page(data.entries.page + 1)">{{ 'Next →' | t }}</button></div></footer>
   </section>
 </div>

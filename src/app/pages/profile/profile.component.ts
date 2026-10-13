@@ -1,18 +1,26 @@
+import { UnsavedChangesService } from '../../shared/forms/unsaved-changes.service';
+import { FormUiModule } from '../../shared/forms/form-ui.module';
+import { I18nModule } from '../../i18n/i18n.module';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthFrontService } from '../../auth/auth.service';
+import { I18nService, Language } from '../../i18n/i18n.service';
 import { CashBalanceService } from '../../core/cash-balance.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormUiModule, I18nModule, CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit {
+  @ViewChild('profileForm') profileForm?: NgForm;
+  @ViewChild('languageForm') languageForm?: NgForm;
+  @ViewChild('passwordForm') passwordForm?: NgForm;
+  get busy() { return this.saving || this.languageSaving || this.changingPassword; }
   loading = true;
   saving = false;
   error = '';
@@ -27,7 +35,43 @@ export class ProfileComponent implements OnInit {
   changingPassword = false;
   passwordError = '';
 
-  constructor(private api: CashBalanceService, private auth: AuthFrontService, private router: Router) {}
+  language: Language = 'es';
+  languageSaving = false;
+  languageLoading = true;
+  languageError = '';
+  languageSaved = false;
+
+  saveLanguage() {
+    if (this.busy || this.languageLoading) return;
+    this.languageSaving = true;
+    this.languageError = '';
+    this.languageSaved = false;
+    this.api.updatePreferences(this.language).subscribe({
+      next: preferences => {
+        this.i18n.setLanguage(preferences.language);
+        this.languageSaving = false;
+        this.languageSaved = true;
+        this.languageForm?.form.markAsPristine();
+      },
+      error: () => { this.languageSaving = false; this.languageError = 'We could not save your language. Please try again.'; }
+    });
+  }
+  loadLanguage() {
+    this.languageLoading = true;
+    this.languageError = '';
+    this.api.preferences().subscribe({
+      next: preferences => {
+        this.language = preferences.language;
+        this.i18n.setLanguage(preferences.language);
+        this.languageLoading = false;
+      },
+      error: () => { this.languageLoading = false; this.languageError = 'We could not load your language preference.'; }
+    });
+  }
+
+  constructor(private api: CashBalanceService, private auth: AuthFrontService, private router: Router, private i18n: I18nService, private unsaved: UnsavedChangesService) { this.language = i18n.language; }
+
+  get currentPasswordTooLong() { return new TextEncoder().encode(this.currentPassword).length > 72; }
 
   get passwordValidationError(): string {
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) return 'Completa los tres campos.';
@@ -39,8 +83,13 @@ export class ProfileComponent implements OnInit {
     return '';
   }
 
-  changePassword(form: NgForm) {
-    if (this.changingPassword || this.passwordValidationError) return;
+  changePassword(form: NgForm, confirmed = false) {
+    if (this.busy || this.passwordValidationError) return;
+    if (!confirmed) {
+      const discard = this.unsaved.confirmDiscard([this.profileForm, this.languageForm]);
+      if (discard instanceof Promise) { void discard.then(accepted => { if (accepted) this.changePassword(form, true); }); return; }
+      if (!discard) return;
+    }
     this.changingPassword = true;
     this.passwordError = '';
     this.api.changePassword(this.currentPassword, this.newPassword).subscribe({
@@ -61,7 +110,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  ngOnInit() { this.load(); }
+  ngOnInit() { this.load(); this.loadLanguage(); }
 
   load() {
     this.loading = true;
@@ -78,7 +127,7 @@ export class ProfileComponent implements OnInit {
   }
 
   save() {
-    if (!this.id || this.saving || !this.username.trim() || !this.email.trim()) return;
+    if (!this.id || this.busy || this.profileForm?.invalid || !this.username.trim() || !this.email.trim()) return;
     this.saving = true;
     this.error = '';
     this.success = false;
@@ -88,6 +137,7 @@ export class ProfileComponent implements OnInit {
         this.email = user.email ?? this.email.trim();
         this.saving = false;
         this.success = true;
+        this.profileForm?.form.markAsPristine();
       },
       error: () => { this.saving = false; this.error = 'No se han podido guardar los cambios. Revisa los datos e inténtalo de nuevo.'; }
     });

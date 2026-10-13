@@ -1,3 +1,6 @@
+import { of } from 'rxjs';
+import { CashBalanceService } from '../core/cash-balance.service';
+import { I18nModule } from '../i18n/i18n.module';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LayoutComponent } from './layout.component';
 import { RouterTestingModule } from '@angular/router/testing'; // ✅ IMPORTA ESTO
@@ -8,8 +11,9 @@ describe('LayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [{ provide: CashBalanceService, useValue: { preferences: () => of({ language: 'en' }) } }],
       declarations: [LayoutComponent],
-      imports: [RouterTestingModule], // ✅ AÑADE ESTO
+      imports: [I18nModule, RouterTestingModule], // ✅ AÑADE ESTO
     }).compileComponents();
 
     fixture = TestBed.createComponent(LayoutComponent);
